@@ -21,26 +21,20 @@
         </div>
     </div>
     <form method="post" id="action_form">
-        <div class="mb-3">
+        <div class="mb-3 ">
             <label for="title" class="form-label">Title</label>
             <input type="text" class="form-control" id="title" aria-describedby="title" name="title">
-            <div id="title" class="form-text">Title ex. I'm the best</div>
+            <div id="title" class="form-text ">Title ex. I'm the best</div>
         </div>
 
-
-        <div class="mb-3">
+        <div class="mb-3 justify-content-end">
             <label for="summary" class="form-label">Summary information</label>
-            <input type="text" class="form-control" id="summary" aria-describedby="summary" name="summary">
+            <input type="text" class="form-control justify-content-end" id="summary" aria-describedby="summary" name="summary" >
             <div id="summary" class="form-text">Summary ex. 250 000 000 kr</div>
         </div>
-        <div class="mb-3">
-            <label for="transaktions" class="form-label">Summary information</label>
-            <input type="text" class="form-control" id="transaktions" aria-describedby="transaktions"
-                   name="transaktions">
-            <div id="transaktions" class="form-text">Transaktions ex. 250 000 -> AB kr</div>
-        </div>
+        <script src="{{ url_for('static',filename='js/accounting.js') }}"></script>
         <script src="{{ url_for('static',filename='js/csv.js') }}"></script>
 
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button id="submit_button" type="submit" class="btn btn-primary">Submit</button>
     </form>
 {% endblock %}
