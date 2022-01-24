@@ -1,8 +1,9 @@
-function new_input(data, class_name) {
+function new_input(data, class_name, name) {
     const input_tr_date = document.createElement('input')
     input_tr_date.type = 'text'
     input_tr_date.className = class_name
     input_tr_date.value = data
+    input_tr_date.name = name
     return input_tr_date;
 }
 
@@ -11,24 +12,28 @@ function createARow(tr_date, tr_name, tr_amount, tr_id) {
     new_input_group.className = 'input-group mb-1'
 
     //transaktion ID
-    const input_tr_id = new_input(tr_id, 'input-group-text col-sm-1 justify-content-start');
-    input_tr_id.disabled = true
-    //transaktion Date
-    const input_tr_date = new_input(tr_date, 'input-group-text col-sm-2 justify-content-start');
-    input_tr_date.disabled = true
-    //transaktion Name
-    const input_tr_name = new_input(tr_name, 'form-control col-lg justify-content-center')
-    input_tr_name.style.textAlign = 'center'
-    //transaktion amount
-    const input_tr_amount = new_input(tr_amount, 'input-group-text col-sm-2 justify-content-end')
-    input_tr_amount.disabled = true
-    //transaktion konto
-    const konto = tr_filter(tr_name, tr_amount)
+    const input_tr_id = new_input(tr_id, 'input-group-text col-sm-1 justify-content-start', 'tr_id_' + tr_id);
+    input_tr_id.readOnly = "readonly"
 
-    const input_tr_konto_primary = new_input(konto[0], 'input-group-text col-sm-1 justify-content-start');
+    //transaktion Date
+    const input_tr_date = new_input(tr_date, 'input-group-text col-sm-2 justify-content-start', 'tr_date_' + tr_id);
+    input_tr_date.readOnly = "readonly"
+
+    //transaktion Name
+    const input_tr_name = new_input(tr_name, 'form-control col-lg justify-content-center', 'tr_name_' + tr_id)
+    input_tr_name.style.textAlign = 'center'
+
+    //transaktion amount
+    const input_tr_amount = new_input(tr_amount, 'input-group-text col-sm-2 justify-content-end', 'tr_amount_' + tr_id)
+    input_tr_amount.readOnly = "readonly"
+
+    //transaktion konto
+    const konto = tr_filter(tr_name, tr_amount, input_tr_name,)
+    const input_tr_konto_primary = new_input(konto[0], 'input-group-text col-sm-1 justify-content-start', 'konto_p_' + tr_id);
     input_tr_konto_primary.disabled = true
-    const input_tr_konto_secondary = new_input(konto[1], 'input-group-text col-sm-1 justify-content-start');
+    const input_tr_konto_secondary = new_input(konto[1], 'input-group-text col-sm-1 justify-content-start', 'konto_s_' + tr_id);
     input_tr_konto_secondary.disabled = true
+
 
     if (parseInt(tr_amount) < 0) {
         input_tr_date.style.color = 'red'
@@ -39,9 +44,13 @@ function createARow(tr_date, tr_name, tr_amount, tr_id) {
     } else {
         input_tr_date.style.color = 'green'
         input_tr_amount.style.color = 'green'
-        // input_tr_name.style.color = 'green'
+        //input_tr_name.style.color = 'green'
         input_tr_konto_secondary.style.color = 'green'
         input_tr_konto_primary.style.color = 'green'
+    }
+    if (konto[2] === 'coral') {
+        input_tr_konto_secondary.style.color = konto[2]
+        input_tr_name.style.color = konto[2]
     }
 
 
@@ -134,13 +143,14 @@ function tr_filter(tr_name, tr_amount) {
         'Lån'
     ]
 
-    let a, b
+    let a = 1930, b = 2893, tr_color = ''
 
     function filter(konto_array, konto_a, konto_b, tr_name) {
         for (const string of konto_array) {
             if (tr_name.includes(string)) {
                 a = konto_a
                 b = konto_b
+                tr_color = 'coral'
                 break
             }
         }
@@ -153,12 +163,10 @@ function tr_filter(tr_name, tr_amount) {
         filter(konto_6570, 1930, 6570, tr_name);
         filter(konto_1613, 1930, 1613, tr_name);
         filter(konto_1680, 1930, 1680, tr_name);
-
     } else {
-        a = 5555
-        b = 6666
+
     }
-    return [a, b]
+    return [a, b, tr_color]
 }
 
 /*------ Method for read uploded csv file ------*/
