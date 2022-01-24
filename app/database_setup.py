@@ -6,22 +6,7 @@ from datetime import datetime
 Base = declarative_base()
 
 
-# class Topic(Base):
-#     __tablename__ = 'topic'
-#     __tableargs__ = {'comment': 'Темы цитат'}
-#
-#     topic_id = Column(
-#         Integer,
-#         nullable=False,
-#         unique=True,
-#         primary_key=True,
-#         autoincrement=True
-#     )
-#     name = Column(String(128), comment='Наименование темы')
-#     description = Column(Text, comment='Описание темы')
-#
-#     def __repr__(self):
-#         return f'{self.topic_id} {self.name} {self.description}'
+
 
 
 class BankStatement(Base):
@@ -38,17 +23,16 @@ class BankStatement(Base):
 
 
 class Transaktions(Base):
-    __tablename__ = 'Transaktions'
-    __tableargs__ = {'comment': 'Transaktions'}
+    __tablename__ = 'transaktions'
+    __tableargs__ = {'comment': 'transaktions'}
     quote_id = Column(Integer, nullable=False, unique=True, primary_key=True, autoincrement=True)
-    text = Column(Text, comment='#####')
     bank_statement_id = Column(Integer, ForeignKey('bank_statement.bank_statement_id'), comment='Bank Statement')
     bank_statement = relationship('BankStatement', backref='quote_author', lazy='subquery')
+    tr_date = Column(String(128), default=datetime.utcnow(), comment='data')
+    tr_name = Column(String(128), default=datetime.utcnow(), comment='name')
+    tr_amount = Column(String(128), default=datetime.utcnow(), comment='amount')
+    konto_p = Column(String(128), default=datetime.utcnow(), comment='Primary konto')
+    konto_s = Column(String(128), default=datetime.utcnow(), comment='Secondary konto')
 
     def __repr__(self):
-        return f'{self.text} {self.bank_statement_id}'
-
-
-
-
-
+        return f'{self.tr_name} {self.bank_statement_id}'

@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    statements list
+{% endblock %}
+
+{#
+
+#VER A 2 20210104 Bisnode 20210412
+{
+   #TRANS 1930 {} -253.00
+   #TRANS 1799 {} 253.00
+}
+
+#}
+{% block body %}
+    <main class="mt-3">
+        {{ statements[0].title }}
+    </main>
+
+{% endblock %}

@@ -12,27 +12,27 @@ function createARow(tr_date, tr_name, tr_amount, tr_id) {
     new_input_group.className = 'input-group mb-1'
 
     //transaktion ID
-    const input_tr_id = new_input(tr_id, 'input-group-text col-sm-1 justify-content-start', 'tr_id_' + tr_id);
+    const input_tr_id = new_input(tr_id, 'input-group-text col-sm-1 justify-content-start', 'tr_id');
     input_tr_id.readOnly = "readonly"
 
     //transaktion Date
-    const input_tr_date = new_input(tr_date, 'input-group-text col-sm-2 justify-content-start', 'tr_date_' + tr_id);
+    const input_tr_date = new_input(tr_date, 'input-group-text col-sm-2 justify-content-start', 'tr_date');
     input_tr_date.readOnly = "readonly"
 
     //transaktion Name
-    const input_tr_name = new_input(tr_name, 'form-control col-lg justify-content-center', 'tr_name_' + tr_id)
+    const input_tr_name = new_input(tr_name, 'form-control col-lg justify-content-center', 'tr_name')
     input_tr_name.style.textAlign = 'center'
 
     //transaktion amount
-    const input_tr_amount = new_input(tr_amount, 'input-group-text col-sm-2 justify-content-end', 'tr_amount_' + tr_id)
+    const input_tr_amount = new_input(tr_amount, 'input-group-text col-sm-2 justify-content-end', 'tr_amount')
     input_tr_amount.readOnly = "readonly"
 
     //transaktion konto
     const konto = tr_filter(tr_name, tr_amount, input_tr_name,)
-    const input_tr_konto_primary = new_input(konto[0], 'input-group-text col-sm-1 justify-content-start', 'konto_p_' + tr_id);
-    input_tr_konto_primary.disabled = true
-    const input_tr_konto_secondary = new_input(konto[1], 'input-group-text col-sm-1 justify-content-start', 'konto_s_' + tr_id);
-    input_tr_konto_secondary.disabled = true
+    const input_tr_konto_primary = new_input(konto[0], 'input-group-text col-sm-1 justify-content-start', 'konto_p');
+    input_tr_konto_primary.readOnly = "readonly"
+    const input_tr_konto_secondary = new_input(konto[1], 'input-group-text col-sm-1 justify-content-start', 'konto_s');
+    input_tr_konto_secondary.readOnly = "readonly"
 
 
     if (parseInt(tr_amount) < 0) {
@@ -95,18 +95,6 @@ function uploadDealcsv() {
 };
 
 function tr_filter(tr_name, tr_amount) {
-
-    //Bokföringssystemet
-    // Samtliga utbetalningar som heter Aut, avräkning, avr, utlägg, privat ska döpas till konto 2893 istället för 1799.
-    // Samtliga transaktioner som heter Skatteverket ska ha kontonummer 1630
-    // Samtliga transaktioner som är nummer, t.ex. 81056563654326 döper du till 1613
-    // Samtliga transaktioner som heter fordonsskatt eller trängselskatt döps till konto 5616
-
-    // Samtliga transaktioner som heter banktjänster döps till 6570
-    // Samtliga transaktioner som heter lön, döps till 1613
-    // Samtliga transaktioner som heter lån döps till 1680
-    // Kan du även lägga till följande kontonr i localhost:
-    // 1932, 1933, 1934, 1935
 
     const konto_2893 = [
         'Aut',
@@ -201,6 +189,8 @@ uploadDealcsv.prototype.getParsecsvdata = function (data) {
 
         parsedata.push(newLinebrk[i].split(","))
     }
+    document.getElementById('action_form').style.display=''
+
     SEB(parsedata)
 
 

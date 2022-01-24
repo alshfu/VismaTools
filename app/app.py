@@ -3,6 +3,8 @@ from flask import Flask, render_template, request, redirect
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, BankStatement, Transaktions
+from sqlalchemy import desc
+
 
 app = Flask(__name__)
 engine = create_engine('sqlite:///vismatools.db?check_same_thread=False')
@@ -13,10 +15,19 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 
+
 @app.route('/')
 @app.route('/home')
 def index():
     return render_template('index.html')
+
+
+@app.route('/bank_statements')
+def get_list_of_statements():
+    statements = session.query(BankStatement).order_by(desc(BankStatement.bank_statement_id)).all()
+    print(statements)
+    # statements = session.query(BankStatement).all().sort(key=BankStatement.date, reverse=True))
+    return render_template('bank_statements.html', statements=statements)
 
 
 @app.route('/user/<string:name>/<int:hero_id>')
@@ -32,39 +43,34 @@ def hello_world():  # put application's code here
 @app.route('/create_transaktion', methods=['POST', 'GET'])
 def add_to_db():  # put application's code here
     if request.method == 'POST':
-        i = 0
-        try:
-            for data in request.form:
-                print(data)
-                tr_id = str(i)
-                tr_amount = request.form['tr_amount_' + str(i)]
-                tr_name = request.form['tr_name_' + str(i)]
-                konto_p = request.form['konto_s_' + str(i)]
-                konto_s = request.form['konto_p_' + str(i)]
-                tr_date = request.form['tr_date_' + str(i)]
-                info_string = 'id' + tr_id + ' | ' + tr_date + ' | ' + tr_name + ' | ' + ' | ' + konto_p + ' | ' + konto_s + ' | ' + tr_amount
-                print(info_string)
-                i = i + 1
-        except:
-            print('some error')
-        # print(request.form)
         title = request.form['title']
         summary = request.form['summary']
-        # transaktions = request.form['transaktions']
-        # statement = BankStatement(title=title, summary=summary)
-        # session.add(statement)
-        # session.flush()
-        # transaktion = Transaktions(text=transaktions, bank_statement_id=statement.bank_statement_id)
-        # session.add(transaktion)
-        # session.commit()
+        print(f'title: {title} and summary{summary}')
+        i = 0
+        statement = BankStatement(title=title, summary=summary)
+        session.add(statement)
+        session.flush()
+        try:
+            for i in range(0, len(request.form.getlist('tr_id'))):
+                tr_date = request.form.getlist('tr_date')[i]
+                tr_name = request.form.getlist('tr_name')[i]
+                tr_amount = request.form.getlist('tr_amount')[i]
+                konto_p = request.form.getlist('konto_p')[i]
+                konto_s = request.form.getlist('konto_s')[i]
+                string = f'Id:{i} Date:{tr_date} Name:{tr_name} Amount: {tr_amount} konto_p {konto_p} konto_s {konto_s}'
+                print(string)
+                transaktion = Transaktions(bank_statement_id=statement.bank_statement_id,
+                                           tr_date=tr_date,
+                                           tr_name=tr_name,
+                                           tr_amount=tr_amount,
+                                           konto_s=konto_s,
+                                           konto_p=konto_p)
+                session.add(transaktion)
+                session.commit()
+            return render_template("create_transaktion.html")
+        except:
+            print('some error')
         return render_template("create_transaktion.html")
-        # try:
-        #     session.add(statement)
-        #     session.add(transaktion)
-        #     session.commit()
-        #     return redirect('/')
-        # except:
-        #     return "some Error"
     else:
         return render_template("create_transaktion.html")
 
