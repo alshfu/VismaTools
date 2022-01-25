@@ -5,7 +5,6 @@ from sqlalchemy.orm import sessionmaker
 from database_setup import Base, BankStatement, Transaktions
 from sqlalchemy import desc
 
-
 app = Flask(__name__)
 engine = create_engine('sqlite:///vismatools.db?check_same_thread=False')
 Base.metadata.bind = engine
@@ -15,11 +14,17 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 
-
 @app.route('/')
 @app.route('/home')
 def index():
     return render_template('index.html')
+
+
+@app.route('/transactions/<int:statements_id>')
+def transaktions_list(statements_id):
+    transactions = session.query(BankStatement).get(statements_id)
+    print(transactions.title)
+    return render_template('transactions.html', transactions=transactions)
 
 
 @app.route('/bank_statements')

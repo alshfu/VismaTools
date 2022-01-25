@@ -15,7 +15,36 @@
 #}
 {% block body %}
     <main class="mt-3">
-        {{ statements[0].title }}
+        <form method="post">
+            {% for statement in statements %}
+                <div class="input-group mb-1">
+                    <input type="text"
+                           class="input-group-text col-sm-1 justify-content-start"
+                           name="id"
+                           value="{{ statement.bank_statement_id }}"
+                           readonly="readonly">
+                    <input type="text"
+                           class="input-group-text col-lg justify-content-start"
+                           name="title"
+                           readonly=""
+                           value="{{ statement.title }}">
+                    <input type="text"
+                           class="input-group-text col-sm-2 justify-content-start"
+                           name="summary"
+                           readonly="readonly"
+                           value="{{ statement.summary }}">
+                    <input type="text"
+                           class="input-group-text col-sm-1 justify-content-start"
+                           name="date"
+                           readonly="readonly"
+                           value="{{ statement.date[0:10] }}">
+                    <a href="" class="btn btn-primary">Skapa SE fil</a>
+                    <a href="" class="btn btn-warning">Overifierade lista</a>
+                    <a href="/transactions/{{ statement.bank_statement_id }}" class="btn btn-success">Visa </a>
+                </div>
+            {% endfor %}
+        </form>
     </main>
+
 
 {% endblock %}

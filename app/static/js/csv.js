@@ -24,7 +24,7 @@ function createARow(tr_date, tr_name, tr_amount, tr_id) {
     input_tr_name.style.textAlign = 'center'
 
     //transaktion amount
-    const input_tr_amount = new_input(tr_amount, 'input-group-text col-sm-2 justify-content-end', 'tr_amount')
+    const input_tr_amount = new_input(tr_amount, 'iput-group-text col-sm-2 justify-content-end', 'tr_amount')
     input_tr_amount.readOnly = "readonly"
 
     //transaktion konto
