@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Add to DB
+{% endblock %}
+
+{#
+
+#VER A 2 20210104 Bisnode 20210412
+{
+   #TRANS 1930 {} -253.00
+   #TRANS 1799 {} 253.00
+}
+
+#}
+{% block body %}
+    <main class="mt-3">
+        <script src="{{ url_for('static',filename='js/settings.js') }}"></script>
+        <div class="mb-3 justify-content-end">
+            <a href="javascript:settings()" class="btn btn-primary active mb-2" aria-current="page">Skapa ny filter</a>
+            <div id="label_for_huvudkonto" class="form-text">Lägg till och nya regler</div>
+        </div>
+        <form method="post" id="settings" style="display: none">
+            <div id="label_for_huvudkonto" class="form-text" style="color: aquamarine">
+                Skriv in konto nummer och lägg till nyckel ord elle nyckel fras som passar den här konto
+                <br>Använd | - täcken för att separera nyckel fras
+                <br>OBS!!! Använd inte samma fras för olycka konto nummer,
+                <br><strong>Bara en filter per konto</strong>
+            </div>
+            <div class="mb-3" style="text-align: end">
+                <button type="submit" class="btn btn-primary">Spara</button>
+            </div>
+
+        </form>
+    </main>
+
+{% endblock %}

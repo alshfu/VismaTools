@@ -6,9 +6,6 @@ from datetime import datetime
 Base = declarative_base()
 
 
-
-
-
 class BankStatement(Base):
     __tablename__ = 'bank_statement'
     __tableargs__ = {'comment': 'Bank Statements'}
@@ -20,6 +17,17 @@ class BankStatement(Base):
 
     def __repr__(self):
         return f'{self.bank_statement_id} {self.title} {self.summary} {self.date}'
+
+
+class Settings(Base):
+    __tablename__ = 'settings'
+    __tableargs__ = {'comment': 'Filter installningar'}
+    quote_id = Column(Integer, nullable=False, unique=True, primary_key=True, autoincrement=True)
+    konto = Column(Integer, default=datetime.utcnow(), comment='konto number', unique=True)
+    filter = Column(Text, default=datetime.utcnow(), comment='name')
+
+    def __repr__(self):
+        return f'{self.konto} {self.filter}'
 
 
 class Transaktions(Base):

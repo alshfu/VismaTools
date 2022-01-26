@@ -15,31 +15,56 @@
 #}
 {% block body %}
     <main class="mt-3">
-        <div class="input-group mb-3">
-            <div class="custom-file">
-                <input type="file" class="custom-file-input" id="cvs_file" name="cvs_file">
-                <label class="custom-file-label" for="inputGroupFile02">Choose file</label>
+        <div class="mb-3 justify-content-end">
+            <select class="form-select" aria-label="Default select example" id="main_bank_account">
+                <option selected value="0">Välj BANK</option>
+                <option value="1">SEB</option>
+                <option value="2">SWED Bank</option>
+                <option value="3">SVEA Bank</option>
+                <option value="4">Nordea</option>
+            </select>
+            <div id="label_for_huvudkonto" class="form-text">Välj bank som har utfärdat cvs fil</div>
+            <div class="input-group mb-3">
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="cvs_file" name="cvs_file">
+                    <label class="custom-file-label" for="inputGroupFile02">Choose file</label>
+                </div>
             </div>
+
+
+            <form method="post" id="action_form" style="display: none">
+                <div class="mb-3 ">
+                    <label for="title" class="form-label">Title*</label>
+                    <input type="text" class="form-control" id="title" aria-describedby="title" name="title"
+                           value="NoNaMe AB">
+                    <div id="title" class="form-text ">Petros and Cooperated AB</div>
+                </div>
+
+                <div class="mb-3 justify-content-end">
+                    <label for="summary" class="form-label">Summary information</label>
+                    <input type="text" class="form-control justify-content-end" id="summary" aria-describedby="summary"
+                           name="summary">
+                    <div id="label_for_summary" class="form-text">Summary ex. 250 000 000 kr</div>
+                </div>
+                <div class="mb-3 justify-content-end">
+                    <select class="form-select" aria-label="Default select example" id="main_bank_account">
+                        <option selected value="1932">Välj huvud konto</option>
+                        <option value="1932">Huvud konto 1932</option>
+                        <option value="1933">Spar konto 1933</option>
+                        <option value="1934">Kredit konto 1934</option>
+                        <option value="1935">Svart konto 1935</option>
+                    </select>
+                    <div id="label_for_huvudkonto" class="form-text">V&älj huvud konto t.ex. 1932, 1933, 1934, eller
+                        super konto 1935
+                    </div>
+                </div>
+
+                <script src="{{ url_for('static',filename='js/accounting.js') }}"></script>
+                <script src="{{ url_for('static',filename='js/csv.js') }}"></script>
+
+                <button id="submit_button" type="submit" class="btn btn-primary">Submit</button>
+            </form>
         </div>
-
-        <form method="post" id="action_form" style="display: none">
-            <div class="mb-3 ">
-                <label for="title" class="form-label">Title</label>
-                <input type="text" class="form-control" id="title" aria-describedby="title" name="title">
-                <div id="title" class="form-text ">Petros and Cooperated AB</div>
-            </div>
-
-            <div class="mb-3 justify-content-end">
-                <label for="summary" class="form-label">Summary information</label>
-                <input type="text" class="form-control justify-content-end" id="summary" aria-describedby="summary"
-                       name="summary">
-                <div id="summary" class="form-text">Summary ex. 250 000 000 kr</div>
-            </div>
-            <script src="{{ url_for('static',filename='js/accounting.js') }}"></script>
-            <script src="{{ url_for('static',filename='js/csv.js') }}"></script>
-
-            <button id="submit_button" type="submit" class="btn btn-primary">Submit</button>
-        </form>
     </main>
 
 {% endblock %}

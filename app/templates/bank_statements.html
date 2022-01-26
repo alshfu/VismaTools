@@ -38,7 +38,7 @@
                            name="date"
                            readonly="readonly"
                            value="{{ statement.date[0:10] }}">
-                    <a href="" class="btn btn-primary">Skapa SE fil</a>
+                    <a href="/transactions/se/{{ statement.bank_statement_id }}" class="btn btn-primary">Skapa SE fil</a>
                     <a href="" class="btn btn-warning">Overifierade lista</a>
                     <a href="/transactions/{{ statement.bank_statement_id }}" class="btn btn-success">Visa </a>
                 </div>

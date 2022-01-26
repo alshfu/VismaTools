@@ -15,10 +15,59 @@
 #}
 {% block body %}
 
-        <strong class="me-auto">{{ transactions.title }}</strong>
-    <===>
-        <strong class="me-auto">{{ transactions.summary }}</strong>
+    <strong class="me-auto"></strong>
+    <strong class="me-auto"></strong>
 
+    <label for="basic-url">Namn och konto balance</label>
+    <div class="input-group mb-3">
+        <input type="text" class="form-control" id="basic-url" aria-describedby="basic-addon3"
+               value="{{ statements.title }}">
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="basic-addon3">{{ statements.summary }}</span>
+        </div>
+    </div>
+    <div><a href="/transactions/se/{{ statements.bank_statement_id }}">Ladda ner SE fil</a></div>
+    <div>Skapa lista med overifierade transaktioner</div>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">Datum</th>
+            <th scope="col">Beskrivning</th>
+            <th scope="col">Belopp</th>
+            <th scope="col">Huvud konto</th>
+            <th scope="col">Konto två</th>
+            <th scope="col">Verifierad</th>
+            <th scope="col">Underlag</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for transaktion in transaktions %}
+            <tr>
+                <th scope="col">{{ transaktion.tr_date }}</th>
+                <td>{{ transaktion.tr_name }}</td>
+                <td>
+                    {% if transaktion.tr_amount|float < 0.0 %}
+                        <div style="color: red">{{ transaktion.tr_amount }}</div>
+                    {% else %}
+                        <div style="color: aquamarine">{{ transaktion.tr_amount }}</div>{% endif %}</td>
+                <td>{{ transaktion.konto_p }}</td>
+                <td>{{ transaktion.konto_s }}</td>
+                <td>{% if transaktion.konto_s == '2893' %}
+                    <div style="color: red">Ej verifierad</div>
+                {% else %}
+                    <div style="color: greenyellow">Verifierad</div>
+                {% endif %}
+                </td>
+                <td>Underlag</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+
+    <div class="input-group mb-3">
+        <div class=""></div>
+    </div>
 
 
 

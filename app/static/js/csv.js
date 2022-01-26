@@ -94,6 +94,8 @@ function SEB(data) {
 function uploadDealcsv() {
 };
 
+
+
 function tr_filter(tr_name, tr_amount) {
 
     const konto_2893 = [
@@ -139,26 +141,53 @@ function tr_filter(tr_name, tr_amount) {
                 a = konto_a
                 b = konto_b
                 tr_color = 'coral'
+                // console.log("STOP " + b + '=>' + tr_name)
+                return true
                 break
             }
         }
+        return false
     }
 
+
     if (parseInt(tr_amount) < 0) {
-        filter(konto_2893, 1930, 2893, tr_name);
-        filter(konto_1630, 1930, 1630, tr_name);
-        filter(konto_5616, 1930, 5616, tr_name);
-        filter(konto_6570, 1930, 6570, tr_name);
-        filter(konto_1613, 1930, 1613, tr_name);
-        filter(konto_1680, 1930, 1680, tr_name);
+
+        while (true) {
+            if (filter(konto_2893, 1930, 2893, tr_name) == true)
+                break
+            else if (filter(konto_1630, 1930, 1630, tr_name) == true)
+                break
+            else if (filter(konto_1630, 1930, 1630, tr_name) == true)
+                break
+            else if (filter(konto_5616, 1930, 5616, tr_name) == true)
+                break
+            else if (filter(konto_6570, 1930, 6570, tr_name) == true)
+                break
+            else if (filter(konto_1613, 1930, 1613, tr_name) == true)
+                break
+            else if (filter(konto_1680, 1930, 1680, tr_name) == true)
+                break
+            break
+        }
+
     } else {
 
     }
+
     return [a, b, tr_color]
 }
 
+
 /*------ Method for read uploded csv file ------*/
 uploadDealcsv.prototype.getCsv = function (e) {
+    let main_bank_account = document.getElementById('main_bank_account')
+    main_bank_account.addEventListener('change', function () {
+
+        let konto_p = document.getElementsByName('konto_p')
+        for (let elem of konto_p) {
+            elem.value = main_bank_account.value
+        }
+    })
 
     let input = document.getElementById('cvs_file');
     input.addEventListener('change', function () {
@@ -189,7 +218,7 @@ uploadDealcsv.prototype.getParsecsvdata = function (data) {
 
         parsedata.push(newLinebrk[i].split(","))
     }
-    document.getElementById('action_form').style.display=''
+    document.getElementById('action_form').style.display = ''
 
     SEB(parsedata)
 
