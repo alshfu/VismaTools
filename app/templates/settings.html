@@ -20,12 +20,8 @@
             <a href="javascript:settings()" class="btn btn-primary active mb-2" aria-current="page">Skapa ny filter</a>
             <div id="label_for_huvudkonto" class="form-text">Lägg till och nya regler</div>
         </div>
+        <div id="new_settings_form"></div>
 
-        {% if settings|length > 0 %}
-            <form method="post" id="settings">
-        {% else %}
-            <form method="post" id="settings" style="display: none">
-        {% endif %}
         <div id="label_for_huvudkonto" class="form-text" style="color: aquamarine">
             <div id="label_for_huvudkonto" class="form-text" style="color: aquamarine">
                 Skriv in konto nummer och lägg till nyckel ord elle nyckel fras som passar den här konto
@@ -33,26 +29,31 @@
                 <br>OBS!!! Använd inte samma fras för olycka konto nummer,
                 <br><strong>Bara en filter per konto</strong>
             </div>
-            <div class="mb-3" style="text-align: end">
-                <button type="submit" class="btn btn-primary">Spara</button>
-            </div>
             {% if settings|length > 0 %}
                 {% for setting in settings %}
-                    <div class="input-group mb-1">
-                        <input type="text"
-                               class="input-group-text col-sm-1 justify-content-start"
-                               name="konto_n"
-                               style="height: 38px; color: red;"
-                               value={{ setting.konto }}
-                        >
-                        <textarea class="form-control col-lg justify-content-center"
-                                  name="filter_list">{{ setting.filter }}
+                    <form method="post" id="settings" action="/settings/{{ setting.quote_id }}/edit/">
+                        <div class="mb-1" style="text-align: right">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="bi bi-arrow-repeat"> updater</i>
+                            </button>
+                            <a class="btn btn-primary" href="/settings/{{ setting.quote_id }}/delete/" role="button">
+                                <i class="bi bi-trash"> radera </i>
+                            </a>
+                        </div>
+                        <div class="input-group mb-1">
+                            <input type="text"
+                                   class="input-group-text col-sm-1 justify-content-start"
+                                   name="konto_n"
+                                   style="height: 38px; color: red;"
+                                   value={{ setting.konto }}
+                            >
+                            <textarea class="form-control col-lg justify-content-center"
+                                      name="filter_list">{{ setting.filter }}
                         </textarea>
-                    </div>
+                        </div>
+                    </form>
                 {% endfor %}
             {% endif %}
         </div>
-        </form>
     </main>
-
 {% endblock %}

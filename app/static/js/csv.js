@@ -95,85 +95,27 @@ function uploadDealcsv() {
 };
 
 
-
 function tr_filter(tr_name, tr_amount) {
-
-    const konto_2893 = [
-        'Aut',
-        'avräkning',
-        'avr',
-        'utlägg',
-        'privat',
-        'Vattenfall'
-    ]
-    const konto_5616 = [
-        'fordonsskatt',
-        'trängselskatt',
-        'Fordonsskatt',
-        'Trängselskatt',
-    ]
-    const konto_1630 = [
-        'Skatteverket',
-        'skatteverket',
-        'Felparkeringsavgift',
-        'skatt'
-    ]
-    const konto_6570 = [
-        'banktjänster',
-        'Banktjänster'
-    ]
-    const konto_1613 = [
-        'lön',
-        'LÖN',
-        'Lön'
-    ]
-    const konto_1680 = [
-        'lån',
-        'LÅN',
-        'Lån'
-    ]
-
     let a = 1930, b = 2893, tr_color = ''
 
-    function filter(konto_array, konto_a, konto_b, tr_name) {
-        for (const string of konto_array) {
-            if (tr_name.includes(string)) {
-                a = konto_a
-                b = konto_b
-                tr_color = 'coral'
-                // console.log("STOP " + b + '=>' + tr_name)
-                return true
-                break
+    for (const fil in filter_list) {
+        let konto_num = filter_list[fil][0].konto
+        let filter_n = filter_list[fil][0].filter_str.split('|')
+        // console.log(konto_num + '>>>' + filter_n)
+        if (parseInt(tr_amount) < 0) {
+            for (const string of filter_n) {
+                if (tr_name.includes(string)) {
+                    a = 1930
+                    b = parseInt(konto_num)
+                    tr_color = 'coral'
+                    console.log("STOP " + b + '=>' + tr_name)
+                    return [a, b, tr_color]
+                    break
+                }
             }
         }
-        return false
-    }
-
-
-    if (parseInt(tr_amount) < 0) {
-
-        while (true) {
-            if (filter(konto_2893, 1930, 2893, tr_name) == true)
-                break
-            else if (filter(konto_1630, 1930, 1630, tr_name) == true)
-                break
-            else if (filter(konto_1630, 1930, 1630, tr_name) == true)
-                break
-            else if (filter(konto_5616, 1930, 5616, tr_name) == true)
-                break
-            else if (filter(konto_6570, 1930, 6570, tr_name) == true)
-                break
-            else if (filter(konto_1613, 1930, 1613, tr_name) == true)
-                break
-            else if (filter(konto_1680, 1930, 1680, tr_name) == true)
-                break
-            break
-        }
-
-    } else {
 
     }
-
     return [a, b, tr_color]
 }
 
@@ -182,9 +124,9 @@ function tr_filter(tr_name, tr_amount) {
 uploadDealcsv.prototype.getCsv = function (e) {
     let main_bank_account = document.getElementById('main_bank_account')
     main_bank_account.addEventListener('change', function () {
-
         let konto_p = document.getElementsByName('konto_p')
         for (let elem of konto_p) {
+            console.log(elem.value)
             elem.value = main_bank_account.value
         }
     })

@@ -16,7 +16,7 @@
 {% block body %}
     <main class="mt-3">
         <div class="mb-3 justify-content-end">
-            <select class="form-select" aria-label="Default select example" id="main_bank_account">
+            <select class="form-select" aria-label="Default select example" id="Bank">
                 <option selected value="0">Välj BANK</option>
                 <option value="1">SEB</option>
                 <option value="2">SWED Bank</option>
@@ -30,7 +30,6 @@
                     <label class="custom-file-label" for="inputGroupFile02">Choose file</label>
                 </div>
             </div>
-
 
             <form method="post" id="action_form" style="display: none">
                 <div class="mb-3 ">
@@ -58,7 +57,19 @@
                         super konto 1935
                     </div>
                 </div>
-
+                <script>
+                    let filter_list = {
+                        {% for filter in filters %}
+                            "{{filter.quote_id}}":
+                                [
+                                    {
+                                        "konto": "{{ filter.konto }}",
+                                        "filter_str": "{{ filter.filter }}"
+                                    }
+                                ],
+                        {% endfor %}
+                    }
+                </script>
                 <script src="{{ url_for('static',filename='js/accounting.js') }}"></script>
                 <script src="{{ url_for('static',filename='js/csv.js') }}"></script>
 

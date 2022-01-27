@@ -3,7 +3,7 @@ import os
 import sys
 
 import sqlalchemy
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, url_for
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, BankStatement, Transaktions, Settings
@@ -97,46 +97,56 @@ def hello_world():  # put application's code here
 
 
 @app.route('/settings', methods=['POST', 'GET'])
-def settings():
+def show_settings():
     settings_list = session.query(Settings).all()
-    # # TODO utf�ra kontroll av duplicering i konto_n   s� att de kopplas ihop
-    # # ---------------------------------------------
-    # result = checkIfDuplicates_1(konto_list)
-    # if result:
-    #     import collections
-    #     print('Yes, list contains duplicates')
-    #     print([item for item, count in collections.Counter(konto_list).items() if count > 1])
-    #     for key in range(0, len(konto_list)):
-    #         print(key)
-    #
-    # else:
-    #     print('No duplicates found in list')
-    #
-    # # ----------------------------------------------
-    # def checkIfDuplicates_1(listOfElems):
-    #     ''' Check if given list contains any duplicates '''
-    #     if len(listOfElems) == len(set(listOfElems)):
-    #         return False
-    #     else:
-    #         return True
+    # # TODO utföra kontroll av duplicering i konto_n   så att de kopplas ihop
+    return render_template('settings.html', settings=settings_list)
+
+
+@app.route('/settings/new', methods=['POST', 'GET'])
+def new_setting():
+    # TODO utföra kontroll av duplicering i konto_n   så att de kopplas ihop
     if request.method == 'POST':
-        konto_list = request.form.getlist('konto_n')
-        filter_list = request.form.getlist('filter_list')
-        for i in range(0, len(konto_list)):
-            print(f"konto nummer => {konto_list[i]} => {filter_list[i]} ")
-            try:
-                settings_table = Settings(konto=konto_list[i], filter=filter_list[i])
-                session.add(settings_table)
-                session.commit()
-            except(sqlalchemy.exc.PendingRollbackError, sqlalchemy.exc.IntegrityError):
-                pass
-        return render_template('index.html')
+        new_filter = Settings(konto=request.form['konto_n'], filter=request.form['filter_list'])
+        session.add(new_filter)
+        session.commit()
+        return redirect(url_for('show_settings'))
     else:
-        return render_template('settings.html', settings=settings_list)
+        return render_template('settings,html')
+
+
+@app.route("/settings/<int:setting_id>/edit/", methods=['GET', 'POST'])
+def update_setting(setting_id):
+    edited_setting = session.query(Settings).filter_by(quote_id=setting_id).one()
+    konto = request.form['konto_n']
+    filters = request.form['filter_list']
+
+    print(setting_id)
+    if request.method == 'POST':
+        if request.form['konto_n']:
+            setting = session.query(Settings).get(setting_id)
+            setting.filter = filters
+            session.commit()
+            return redirect(url_for('show_settings'))
+    else:
+        return render_template('settings.html')
+
+
+@app.route('/settings/<int:setting_id>/delete/', methods=['GET', 'POST'])
+def delete_setting(setting_id):
+    setting_to_delete = session.query(Settings).filter_by(quote_id=setting_id).one()
+    if request.method == 'GET':
+        session.delete(setting_to_delete)
+        session.commit()
+        return redirect(url_for('show_settings'))
+    else:
+        return redirect(url_for('show_settings'))
 
 
 @app.route('/create_transaktion', methods=['POST', 'GET'])
 def add_to_db():  # put application's code here
+    filters = session.query(Settings).all()
+    print(filters)
     if request.method == 'POST':
         title = request.form['title']
         summary = request.form['summary']
@@ -166,9 +176,8 @@ def add_to_db():  # put application's code here
         except:
             print('some error')
         return render_template("create_transaktion.html")
-
     else:
-        return render_template("create_transaktion.html")
+        return render_template("create_transaktion.html", filters=filters)
 
 
 def clean_se_folder():
