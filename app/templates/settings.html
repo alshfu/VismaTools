@@ -20,7 +20,13 @@
             <a href="javascript:settings()" class="btn btn-primary active mb-2" aria-current="page">Skapa ny filter</a>
             <div id="label_for_huvudkonto" class="form-text">Lägg till och nya regler</div>
         </div>
-        <form method="post" id="settings" style="display: none">
+
+        {% if settings|length > 0 %}
+            <form method="post" id="settings">
+        {% else %}
+            <form method="post" id="settings" style="display: none">
+        {% endif %}
+        <div id="label_for_huvudkonto" class="form-text" style="color: aquamarine">
             <div id="label_for_huvudkonto" class="form-text" style="color: aquamarine">
                 Skriv in konto nummer och lägg till nyckel ord elle nyckel fras som passar den här konto
                 <br>Använd | - täcken för att separera nyckel fras
@@ -30,7 +36,22 @@
             <div class="mb-3" style="text-align: end">
                 <button type="submit" class="btn btn-primary">Spara</button>
             </div>
-
+            {% if settings|length > 0 %}
+                {% for setting in settings %}
+                    <div class="input-group mb-1">
+                        <input type="text"
+                               class="input-group-text col-sm-1 justify-content-start"
+                               name="konto_n"
+                               style="height: 38px; color: red;"
+                               value={{ setting.konto }}
+                        >
+                        <textarea class="form-control col-lg justify-content-center"
+                                  name="filter_list">{{ setting.filter }}
+                        </textarea>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
         </form>
     </main>
 

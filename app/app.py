@@ -1,6 +1,8 @@
 import glob
 import os
 import sys
+
+import sqlalchemy
 from flask import Flask, render_template, request, redirect
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -96,7 +98,8 @@ def hello_world():  # put application's code here
 
 @app.route('/settings', methods=['POST', 'GET'])
 def settings():
-    # # TODO utföra kontroll av duplicering i konto_n   så att de kopplas ihop
+    settings_list = session.query(Settings).all()
+    # # TODO utfï¿½ra kontroll av duplicering i konto_n   sï¿½ att de kopplas ihop
     # # ---------------------------------------------
     # result = checkIfDuplicates_1(konto_list)
     # if result:
@@ -119,23 +122,16 @@ def settings():
     if request.method == 'POST':
         konto_list = request.form.getlist('konto_n')
         filter_list = request.form.getlist('filter_list')
-        settings_table = Settings
         for i in range(0, len(konto_list)):
             print(f"konto nummer => {konto_list[i]} => {filter_list[i]} ")
-            settings_table = Settings(konto=konto_list[i], filter=filter_list[i])
-            session.add(settings_table)
-            session.commit()
-        try:
-            print(request.form)
-            return render_template("settings.html")
-        except:
-            pass
+            try:
+                settings_table = Settings(konto=konto_list[i], filter=filter_list[i])
+                session.add(settings_table)
+                session.commit()
+            except(sqlalchemy.exc.PendingRollbackError, sqlalchemy.exc.IntegrityError):
+                pass
+        return render_template('index.html')
     else:
-        try:
-            settings_list = session.query(Settings).get(all)
-            print(settings_list)
-        except:
-            settings_list = 'Inget att visa'
         return render_template('settings.html', settings=settings_list)
 
 
@@ -150,27 +146,27 @@ def add_to_db():  # put application's code here
         session.add(statement)
         session.flush()
         try:
-            for i in range(0, len(request.form.getlist('tr_id'))):
-                tr_date = request.form.getlist('tr_date')[i]
-                tr_name = request.form.getlist('tr_name')[i]
-                tr_amount = request.form.getlist('tr_amount')[i]
-                konto_p = request.form.getlist('konto_p')[i]
-                konto_s = request.form.getlist('konto_s')[i]
-                string = f'Id:{i} Date:{tr_date} Name:{tr_name} Amount: {tr_amount} konto_p {konto_p} konto_s {konto_s}'
-                print(string)
-                transaktion = Transaktions(bank_statement_id=statement.bank_statement_id,
-                                           tr_date=tr_date,
-                                           tr_name=tr_name,
-                                           tr_amount=tr_amount,
-                                           konto_s=konto_s,
-                                           konto_p=konto_p)
-                session.add(transaktion)
-                session.commit()
+            tr_date = request.form.getlist('tr_date')[i]
+            tr_name = request.form.getlist('tr_name')[i]
+            tr_amount = request.form.getlist('tr_amount')[i]
+            konto_p = request.form.getlist('konto_p')[i]
+            konto_s = request.form.getlist('konto_s')[i]
+            string = f'Id:{i} Date:{tr_date} Name:{tr_name} Amount: {tr_amount} konto_p {konto_p} konto_s {konto_s}'
+            print(string)
+            transaktion = Transaktions(bank_statement_id=statement.bank_statement_id,
+                                       tr_date=tr_date,
+                                       tr_name=tr_name,
+                                       tr_amount=tr_amount,
+                                       konto_s=konto_s,
+                                       konto_p=konto_p)
+            session.add(transaktion)
+            session.commit()
 
             return render_template("create_transaktion.html")
         except:
             print('some error')
         return render_template("create_transaktion.html")
+
     else:
         return render_template("create_transaktion.html")
 
