@@ -57,6 +57,6 @@ function create_filter_element() {
 
 function settings() {
     create_filter_element()
-    console.log('Ïm hire ')
+    console.log('ÐŸm hire ')
 
 }

@@ -1,13 +1,8 @@
-import glob
-import os
-import sys
-
-import sqlalchemy
+import re
 from flask import Flask, render_template, request, redirect, url_for
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, BankStatement, Transaktions, Settings
-from sqlalchemy.inspection import inspect
 from sqlalchemy import desc
 from flask import send_file
 
@@ -50,12 +45,13 @@ def create_se_file(statements_id):
     print(file_header)
     i = 1
     try:
-        f = open('SE/' + statements.title + '.SE', 'w')
+        f = open('SE/' + statements.title + '.SE', 'w+')
         f.write(file_header)
         for transaktion in transaktions:
             s_date = statements.date[0:10].replace('-', '')
             tr_date = transaktion.tr_date[0:10].replace('-', '')
             amount_p = transaktion.tr_amount
+            print("add new line to file")
             try:
                 if float(amount_p) < 0:
                     amount_s = amount_p.replace('-', '')
@@ -72,10 +68,11 @@ def create_se_file(statements_id):
                 pass
 
         f.close()
+        return send_file(f"""SE/{statements.title}.SE""", as_attachment=True)
     except FileNotFoundError:
         print("The 'docs' directory does not exist")
+        return redirect(url_for('get_list_of_statements'))
 
-    return send_file(f"""SE/{statements.title}.SE""", as_attachment=True)
 
 
 @app.route('/bank_statements')
@@ -112,7 +109,7 @@ def new_setting():
         session.commit()
         return redirect(url_for('show_settings'))
     else:
-        return render_template('settings,html')
+        return render_template('settings.html')
 
 
 @app.route("/settings/<int:setting_id>/edit/", methods=['GET', 'POST'])
@@ -120,6 +117,7 @@ def update_setting(setting_id):
     edited_setting = session.query(Settings).filter_by(quote_id=setting_id).one()
     konto = request.form['konto_n']
     filters = request.form['filter_list']
+    filters = re.sub(r"[\n\t\s]*", "", filters)
 
     print(setting_id)
     if request.method == 'POST':
@@ -146,7 +144,7 @@ def delete_setting(setting_id):
 @app.route('/create_transaktion', methods=['POST', 'GET'])
 def add_to_db():  # put application's code here
     filters = session.query(Settings).all()
-    print(filters)
+    #   print(filters)
     if request.method == 'POST':
         title = request.form['title']
         summary = request.form['summary']
@@ -178,14 +176,6 @@ def add_to_db():  # put application's code here
         return render_template("create_transaktion.html")
     else:
         return render_template("create_transaktion.html", filters=filters)
-
-
-def clean_se_folder():
-    files = glob.glob('/SE/*')
-    for f in files:
-        print(f)
-        os.remove(f)
-
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', template_folder='../template')

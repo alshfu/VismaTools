@@ -1,3 +1,30 @@
+function tr_filter(tr_name, tr_amount) {
+    let a = 1930
+    let b = 2893
+    let tr_color = ''
+    for (const fil in filter_list) {
+        let konto_num = filter_list[fil][0].konto
+        let filter_n = filter_list[fil][0].filter_str.split('|')
+        // console.log(konto_num + '>>>' + filter_n)
+        if (parseInt(tr_amount) < 0) {
+            for (const string of filter_n) {
+                if (tr_name.includes(string)) {
+                    a = 1930
+                    b = parseInt(konto_num)
+                    tr_color = 'coral'
+                    console.log("STOP " + b + '=>' + tr_name)
+                    console.log('string ->'+ string +' tr_name '+ tr_name)
+                    return [a, b, tr_color]
+                    break
+                }
+            }
+        }
+
+    }
+    console.log(b + ' konto ')
+    return [a, b, tr_color]
+}
+
 function new_input(data, class_name, name) {
     const input_tr_date = document.createElement('input')
     input_tr_date.type = 'text'
@@ -28,7 +55,9 @@ function createARow(tr_date, tr_name, tr_amount, tr_id) {
     input_tr_amount.readOnly = "readonly"
 
     //transaktion konto
-    const konto = tr_filter(tr_name, tr_amount, input_tr_name,)
+    const konto = tr_filter(tr_name, tr_amount, input_tr_name)
+    console.log(tr_name +' '+ konto[1])
+
     const input_tr_konto_primary = new_input(konto[0], 'input-group-text col-sm-1 justify-content-start', 'konto_p');
     input_tr_konto_primary.readOnly = "readonly"
     const input_tr_konto_secondary = new_input(konto[1], 'input-group-text col-sm-1 justify-content-start', 'konto_s');
@@ -93,31 +122,6 @@ function SEB(data) {
 
 function uploadDealcsv() {
 };
-
-
-function tr_filter(tr_name, tr_amount) {
-    let a = 1930, b = 2893, tr_color = ''
-
-    for (const fil in filter_list) {
-        let konto_num = filter_list[fil][0].konto
-        let filter_n = filter_list[fil][0].filter_str.split('|')
-        // console.log(konto_num + '>>>' + filter_n)
-        if (parseInt(tr_amount) < 0) {
-            for (const string of filter_n) {
-                if (tr_name.includes(string)) {
-                    a = 1930
-                    b = parseInt(konto_num)
-                    tr_color = 'coral'
-                    console.log("STOP " + b + '=>' + tr_name)
-                    return [a, b, tr_color]
-                    break
-                }
-            }
-        }
-
-    }
-    return [a, b, tr_color]
-}
 
 
 /*------ Method for read uploded csv file ------*/
