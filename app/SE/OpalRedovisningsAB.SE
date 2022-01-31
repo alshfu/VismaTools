@@ -1,0 +1,12 @@
+#FLAGGA 0
+#FORMAT PC8
+#SIETYP 4
+#PROGRAM "Visma Administration 2000" 2020.3
+#GEN 20211229 
+#FNAMN "OpalRedovisningsAB"
+#TAXAR 2022 
+#VALUTA SEK#VER A 1 20220130 Trafikkontoret c/o servi 20211229
+{
+   #TRANS 1930 {} -1100.00
+   #TRANS 2893 {} 1100.00
+}

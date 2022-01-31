@@ -38,7 +38,7 @@ def add_to_db():  # put application's code here
                 print(id_)
                 id_ = int(id_)
                 tr_date = request.form.getlist('tr_date')[id_]
-                tr_name = request.form.getlist('tr_name')[id_].encode('utf-8')
+                tr_name = request.form.getlist('tr_name')[id_].encode('utf-8') #utf-8
                 tr_amount = request.form.getlist('tr_amount')[id_]
                 konto_p = request.form.getlist('konto_p')[id_]
                 konto_s = request.form.getlist('konto_s')[id_]
