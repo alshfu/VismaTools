@@ -41,13 +41,15 @@
                             </a>
                         </div>
                         <div class="input-group mb-1">
+                            <label for="konto_n"></label>
                             <input type="text"
+                                   id="konto_n"
                                    class="input-group-text col-sm-1 justify-content-start"
                                    name="konto_n"
                                    style="height: 38px; color: red;"
-                                   value={{ setting.konto }}
-                            >
-                            <textarea class="form-control col-lg justify-content-center"
+                                   value={{ setting.konto }}>
+                            <label for="filter_list"></label>
+                            <textarea id="filter_list" class="form-control col-lg justify-content-center"
                                       name="filter_list">{{ setting.filter }}
                         </textarea>
                         </div>
