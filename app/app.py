@@ -5,7 +5,6 @@ from flask import send_file
 from sqlalchemy import create_engine
 from sqlalchemy import desc
 from sqlalchemy.orm import sessionmaker
-
 from database_setup import Base, BankStatement, Transaktions, Settings
 
 app = Flask(__name__)
@@ -29,21 +28,17 @@ def add_to_db():  # put application's code here
     if request.method == 'POST':
         title = request.form['title']
         summary = request.form['summary']
-        print(f'title: {title} and summary{summary}')
         statement = BankStatement(title=title, summary=summary)
         session.add(statement)
         session.flush()
         try:
             for id_ in request.form.getlist('tr_id'):
-                print(id_)
                 id_ = int(id_)
                 tr_date = request.form.getlist('tr_date')[id_]
-                tr_name = request.form.getlist('tr_name')[id_].encode('utf-8') #utf-8
+                tr_name = request.form.getlist('tr_name')[id_]
                 tr_amount = request.form.getlist('tr_amount')[id_]
                 konto_p = request.form.getlist('konto_p')[id_]
                 konto_s = request.form.getlist('konto_s')[id_]
-                string = f'Id:{id_} Date:{tr_date} Name:{tr_name} Amount: {tr_amount} konto_p {konto_p} konto_s {konto_s}'
-                print(string)
                 transaktion = Transaktions(bank_statement_id=statement.bank_statement_id,
                                            tr_date=tr_date,
                                            tr_name=tr_name,
@@ -86,6 +81,7 @@ def create_se_file(statements_id):
 #VALUTA SEK'''
     i = 1
     try:
+        # f = open('SE/' + statements.title + '.SE', 'w')
         file_name = f"""{cwd}/{statements.title.replace(' ', '')}.SE"""
         f = open(file_name, 'w')
         f.write(file_header)
@@ -93,7 +89,6 @@ def create_se_file(statements_id):
             s_date = statements.date[0:10].replace('-', '')
             tr_date = transaktion.tr_date[0:10].replace('-', '')
             amount_p = transaktion.tr_amount
-            print("add new line to file")
             try:
                 if float(amount_p) < 0:
                     amount_s = amount_p.replace('-', '')
@@ -188,7 +183,7 @@ def delete_setting(setting_id):
 
 
 @app.route('/about')
-def hello_world():  # put application's code here
+def about():  # put application's code here
     return render_template("about.html")
 
 
