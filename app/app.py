@@ -69,6 +69,7 @@ def transaktions_list(statements_id):
 def create_se_file(statements_id):
     import os
     cwd = os.getcwd() + "/app/SE"  # Get the current working directory (cwd)
+    # cwd = "SE"  # For Windows 2019 Server
     statements = session.query(BankStatement).get(statements_id)
     transaktions = session.query(Transaktions).filter_by(bank_statement_id=statements_id)
     file_header = f'''#FLAGGA 0
@@ -81,8 +82,8 @@ def create_se_file(statements_id):
 #VALUTA SEK'''
     i = 1
     try:
-        # f = open('SE/' + statements.title + '.SE', 'w')
         file_name = f"""{cwd}/{statements.title.replace(' ', '')}.SE"""
+        print(file_name)
         f = open(file_name, 'w')
         f.write(file_header)
         for transaktion in transaktions:
@@ -188,4 +189,4 @@ def about():  # put application's code here
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host='0.0.0.0', template_folder='../template')
+    app.run(debug=True, host='0.0.0.0')
