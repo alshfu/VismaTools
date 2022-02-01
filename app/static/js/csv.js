@@ -1,6 +1,6 @@
 function tr_filter(tr_name, tr_amount) {
     let a = 1930
-    let b = 2893
+    let b = 1799
     let tr_color = ''
     for (const fil in filter_list) {
         let konto_num = filter_list[fil][0].konto
@@ -12,16 +12,20 @@ function tr_filter(tr_name, tr_amount) {
                     a = 1930
                     b = parseInt(konto_num)
                     tr_color = 'coral'
-                    console.log("STOP " + b + '=>' + tr_name)
-                    console.log('string ->'+ string +' tr_name '+ tr_name)
+                    // console.log("STOP " + b + '=>' + tr_name)
+                    // console.log('string ->'+ string +' tr_name '+ tr_name)
                     return [a, b, tr_color]
                     break
                 }
             }
+        } else if (parseInt(tr_amount) > 0) {
+            a = 1930
+            b = 1910
+            tr_color = 'green'
+            return [a, b, tr_color]
         }
-
     }
-    console.log(b + ' konto ')
+    // console.log(b + ' konto ')
     return [a, b, tr_color]
 }
 
@@ -56,7 +60,7 @@ function createARow(tr_date, tr_name, tr_amount, tr_id) {
 
     //transaktion konto
     const konto = tr_filter(tr_name, tr_amount, input_tr_name)
-    console.log(tr_name +' '+ konto[1])
+    console.log(tr_name + ' ' + konto[1])
 
     const input_tr_konto_primary = new_input(konto[0], 'input-group-text col-sm-1 justify-content-start', 'konto_p');
     input_tr_konto_primary.readOnly = "readonly"
