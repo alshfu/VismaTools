@@ -118,7 +118,10 @@ function SEB(data) {
         if (tr_id == 0)
             document.getElementById('summary').value = accounting.formatMoney(parseInt(line[5]), "Kr", 2, " ", ",", "%v %s"); // €4.999,99()
         const line_array = line.toString().split(',')
-        createARow(line_array[0], line_array[3], line_array[4], tr_id)
+        if (line_array[4] != undefined) {
+            createARow(line_array[0], line_array[3], line_array[4], tr_id)
+        }
+
         tr_id++
     }
     move_submit_button()
