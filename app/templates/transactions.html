@@ -16,7 +16,6 @@
 
     <strong class="me-auto"></strong>
     <strong class="me-auto"></strong>
-
     <label for="basic-url">Namn och konto balance</label>
     <div class="input-group mb-3">
         <input type="text" class="form-control" id="basic-url" aria-describedby="basic-addon3"
@@ -27,41 +26,122 @@
     </div>
     <div><a href="/transactions/se/{{ statements.bank_statement_id }}">Ladda ner SE fil</a></div>
     <div>Skapa lista med overifierade transaktioner</div>
-    <table class="table">
-        <thead>
-        <tr>
-            <th scope="col">Datum</th>
-            <th scope="col">Beskrivning</th>
-            <th scope="col">Belopp</th>
-            <th scope="col">Huvud konto</th>
-            <th scope="col">Konto två</th>
-            <th scope="col">Verifierad</th>
-            <th scope="col">Underlag</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for transaktion in transaktions %}
+    <script>
+        const amount_array = document.getElementsByClassName("amount_")
+        document.addEventListener('DOMContentLoaded', () => {
+            for (let amount of amount_array) {
+                let amount_value = amount.innerHTML
+                console.log(amount_value)
+                let amont_to_sek = new Intl.NumberFormat('sv-SE', {
+                    style: 'currency',
+                    currency: 'SEK'
+                }).format(amount_value)
+                {#console.log(amont_to_sek);#}
+                let amount_float = amont_to_sek.replace(',', '.')
+                amount_float = amount_float.replace(/\s/g, '')
+                amount_float = amount_float.replace('kr', '')
+                {#console.log(amount_float)#}
+                amount.innerHTML = String(amont_to_sek).replace('−', '-')
+            }
+            const getSort = ({target}) => {
+                const order = (target.dataset.order = -(target.dataset.order || -1));
+                const index = [...target.parentNode.cells].indexOf(target);
+                const collator = new Intl.Collator(['en', 'sv'], {numeric: true});
+                const comparator = (index, order) => (a, b) => order * collator.compare(
+                    a.children[index].innerHTML,
+                    b.children[index].innerHTML,
+                );
+                for (const tBody of target.closest('table').tBodies) {
+                    tBody.append(...[...tBody.rows].sort(comparator(index, order)));
+                }
+                for (const cell of target.parentNode.cells)
+                    cell.classList.toggle('sorted', cell === target);
+            };
+            document.querySelectorAll('.table_sort thead').forEach(tableTH => tableTH.addEventListener('click', () => {
+                for (let amount of amount_array) {
+                    let amount_to_sek = amount.innerText
+                    {#console.log(amont_to_sek);#}
+                    let amount_float = amount_to_sek.replace(',', '.')
+                    {#console.log(amount_float)#}
+                    amount_float = amount_float.replace(/\s/g, '')
+                    {#console.log(amount_float)#}
+                    amount_float = amount_float.replace('kr', '')
+                    {#console.log(String(amount_float))#}
+                    amount.innerText = String(amount_float)
+                }
+
+                getSort(event)
+
+                for (let amount of amount_array) {
+                    let amount_value = amount.innerHTML
+                    console.log(amount_value)
+                    let amont_to_sek = new Intl.NumberFormat('sv-SE', {
+                        style: 'currency',
+                        currency: 'SEK'
+                    }).format(amount_value)
+                    {#console.log(amont_to_sek);#}
+                    let amount_float = amont_to_sek.replace(',', '.')
+                    amount_float = amount_float.replace(/\s/g, '')
+                    amount_float = amount_float.replace('kr', '')
+                    {#console.log(amount_float)#}
+                    amount.innerHTML = String(amont_to_sek).replace('−', '-')
+                }
+            }));
+
+        });
+    </script>
+    <form method="post">
+        <table class="table table_sort">
+            <thead>
             <tr>
-                <th scope="col">{{ transaktion.tr_date }}</th>
-                <td>{{ transaktion.tr_name }}</td>
-                <td>
-                    {% if transaktion.tr_amount|float < 0.0 %}
-                        <div style="color: red">{{ transaktion.tr_amount }}</div>
-                    {% else %}
-                        <div style="color: aquamarine">{{ transaktion.tr_amount }}</div>{% endif %}</td>
-                <td>{{ transaktion.konto_p }}</td>
-                <td>{{ transaktion.konto_s }}</td>
-                <td>{% if transaktion.konto_s == '2893' %}
-                    <div style="color: red">Ej verifierad</div>
-                {% else %}
-                    <div style="color: greenyellow">Verifierad</div>
-                {% endif %}
-                </td>
-                <td>Underlag</td>
+                <th scope="col">ID</th>
+                <th scope="col">Datum</th>
+                <th scope="col">Beskrivning</th>
+                <th style="text-align: right" scope="col">Belopp</th>
+                <th style="text-align: right" scope="col">Huvud konto</th>
+                <th style="text-align: right" scope="col">Konto två</th>
+                <th scope="col">Verifierad</th>
+                <th scope="col">Underlag</th>
             </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            {% set count = namespace(value=1) %}
+            {% for transaktion in transaktions %}
+                <tr>
+                    <th scope="col">{{ count.value }}</th>
+                    {% set count.value = count.value + 1 %}
+                    <td>{{ transaktion.tr_date }}</td>
+                    <td>
+                        <input name="tr_name" style="width: 270px" type="text" value="{{ transaktion.tr_name }}">
+                        <input name="tr_quote_id" style="display: none" value="{{ transaktion.quote_id }}">
+                    </td>
+                    <td>
+                        {% if transaktion.tr_amount|float < 0.0 %}
+                            {#                        <div style="color: red; text-align: right">{{ '{:,}'.format(transaktion.tr_amount|float).replace(',', ' ') }}</div>#}
+                            <div class="amount_" style="color: red; text-align: right">{{ transaktion.tr_amount }}</div>
+                        {% else %}
+                            <div class="amount_"
+                                 style="color: aquamarine; text-align: right">{{ transaktion.tr_amount }}</div>{% endif %}
+                        {#                        <div style="color: aquamarine; text-align: right">{{ '{:,}'.format(transaktion.tr_amount|float).replace(',', ' ') }}</div>{% endif %}#}
+                    </td>
+                    <td style="text-align: right">{{ transaktion.konto_p }}</td>
+                    <td style="text-align: right"><input name="tr_konto_s" style="text-align: right; width: 50px"
+                                                         type="text" value="{{ transaktion.konto_s }}"></td>
+                    <td>{% if transaktion.konto_s == '1799' or transaktion.konto_s == '1910' %}
+                        <div style="color: red">Ej verifierad</div>
+                    {% else %}
+                        <div style="color: greenyellow">Verifierad</div>
+                    {% endif %}
+                    </td>
+                    <td>
+                        <button type="submit"><i class="fa fa-refresh"></i></button>
+                    </td>
+                    <td><a href="#"><i class="fa fa-file"></i></a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </form>
 
 
     <div class="input-group mb-3">

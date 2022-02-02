@@ -23,6 +23,7 @@ function tr_filter(tr_name, tr_amount) {
             b = 1910
             tr_color = 'green'
             return [a, b, tr_color]
+            break
         }
     }
     // console.log(b + ' konto ')

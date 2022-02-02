@@ -1,6 +1,7 @@
+import os
 import re
 
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, send_from_directory
 from flask import send_file
 from sqlalchemy import create_engine
 from sqlalchemy import desc
@@ -13,6 +14,12 @@ Base.metadata.bind = engine
 Base.metadata.create_all(engine)
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
+
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico',
+                               mimetype='image/vnd.microsoft.icon')
 
 
 # Home Page
@@ -56,12 +63,40 @@ def add_to_db():  # put application's code here
 
 
 # Transaktions page
-@app.route('/transactions/<int:statements_id>')
+@app.route('/transactions/<int:statements_id>', methods=['POST', 'GET'])
 def transaktions_list(statements_id):
     statements = session.query(BankStatement).get(statements_id)
     transaktions = session.query(Transaktions).filter_by(bank_statement_id=statements_id)
-    print(statements.title)
-    print(transaktions[0])
+    # print(statements.title)
+    # print(transaktions[0])
+    if request.method == 'POST':
+        try:
+            for index_ in range(len(request.form.getlist('tr_quote_id'))):
+                tr_id = request.form.getlist('tr_quote_id')[index_]
+                tr_name = request.form.getlist('tr_name')[index_]
+                konto_s = request.form.getlist('tr_konto_s')[index_]
+                # transaktion = session.query(Transaktions).filter_by(quote_id=tr_id)
+                transaktion = session.query(Transaktions).get(tr_id)
+                transaktion.tr_name = tr_name
+                transaktion.konto_s = konto_s
+                session.commit()
+
+                # print(transaktion.tr_name)
+
+            # tr_amount = request.form.getlist('tr_amount')[id_]
+            # konto_p = request.form.getlist('konto_p')[id_]
+            #
+            # transaktion = Transaktions(bank_statement_id=statement.bank_statement_id,
+            #                            tr_date=tr_date,
+            #                            tr_name=tr_name,
+            #                            tr_amount=tr_amount,
+            #                            konto_s=konto_s,
+            #                            konto_p=konto_p)
+            return redirect(url_for('transaktions_list', statements_id=statements_id))
+        except Exception as e:
+            print(e)
+            return redirect(url_for('transaktions_list', statements_id=statements_id))
+
     return render_template('transactions.html', statements=statements, transaktions=transaktions)
 
 
