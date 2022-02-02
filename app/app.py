@@ -80,18 +80,6 @@ def transaktions_list(statements_id):
                 transaktion.tr_name = tr_name
                 transaktion.konto_s = konto_s
                 session.commit()
-
-                # print(transaktion.tr_name)
-
-            # tr_amount = request.form.getlist('tr_amount')[id_]
-            # konto_p = request.form.getlist('konto_p')[id_]
-            #
-            # transaktion = Transaktions(bank_statement_id=statement.bank_statement_id,
-            #                            tr_date=tr_date,
-            #                            tr_name=tr_name,
-            #                            tr_amount=tr_amount,
-            #                            konto_s=konto_s,
-            #                            konto_p=konto_p)
             return redirect(url_for('transaktions_list', statements_id=statements_id))
         except Exception as e:
             print(e)
