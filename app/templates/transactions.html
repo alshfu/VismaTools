@@ -25,73 +25,34 @@
         </div>
     </div>
     <div><a href="/transactions/se/{{ statements.bank_statement_id }}">Ladda ner SE fil</a></div>
-    <div>Skapa lista med overifierade transaktioner</div>
+    <div>Skapa Visma SE file</div>
     <script>
         const amount_array = document.getElementsByClassName("amount_")
         document.addEventListener('DOMContentLoaded', () => {
-            for (let amount of amount_array) {
-                let amount_value = amount.innerHTML
-                console.log(amount_value)
-                let amont_to_sek = new Intl.NumberFormat('sv-SE', {
-                    style: 'currency',
-                    currency: 'SEK'
-                }).format(amount_value)
-                {#console.log(amont_to_sek);#}
-                let amount_float = amont_to_sek.replace(',', '.')
-                amount_float = amount_float.replace(/\s/g, '')
-                amount_float = amount_float.replace('kr', '')
-                {#console.log(amount_float)#}
-                amount.innerHTML = String(amont_to_sek).replace('−', '-')
-            }
             const getSort = ({target}) => {
+                let i = 0
                 const order = (target.dataset.order = -(target.dataset.order || -1));
                 const index = [...target.parentNode.cells].indexOf(target);
                 const collator = new Intl.Collator(['en', 'sv'], {numeric: true});
                 const comparator = (index, order) => (a, b) => order * collator.compare(
-                    a.children[index].innerHTML,
-                    b.children[index].innerHTML,
+                    a.children[index].getAttribute('data'),
+                    b.children[index].getAttribute('data'),
                 );
                 for (const tBody of target.closest('table').tBodies) {
+                    console.log(i++)
                     tBody.append(...[...tBody.rows].sort(comparator(index, order)));
                 }
                 for (const cell of target.parentNode.cells)
+
                     cell.classList.toggle('sorted', cell === target);
             };
             document.querySelectorAll('.table_sort thead').forEach(tableTH => tableTH.addEventListener('click', () => {
-                for (let amount of amount_array) {
-                    let amount_to_sek = amount.innerText
-                    {#console.log(amont_to_sek);#}
-                    let amount_float = amount_to_sek.replace(',', '.')
-                    {#console.log(amount_float)#}
-                    amount_float = amount_float.replace(/\s/g, '')
-                    {#console.log(amount_float)#}
-                    amount_float = amount_float.replace('kr', '')
-                    {#console.log(String(amount_float))#}
-                    amount.innerText = String(amount_float)
-                }
-
                 getSort(event)
-
-                for (let amount of amount_array) {
-                    let amount_value = amount.innerHTML
-                    console.log(amount_value)
-                    let amont_to_sek = new Intl.NumberFormat('sv-SE', {
-                        style: 'currency',
-                        currency: 'SEK'
-                    }).format(amount_value)
-                    {#console.log(amont_to_sek);#}
-                    let amount_float = amont_to_sek.replace(',', '.')
-                    amount_float = amount_float.replace(/\s/g, '')
-                    amount_float = amount_float.replace('kr', '')
-                    {#console.log(amount_float)#}
-                    amount.innerHTML = String(amont_to_sek).replace('−', '-')
-                }
             }));
-
         });
     </script>
     <form method="post">
-        <table class="table table_sort">
+        <table class="table_sort table table-striped">
             <thead>
             <tr>
                 <th scope="col">ID</th>
@@ -108,24 +69,22 @@
             {% set count = namespace(value=1) %}
             {% for transaktion in transaktions %}
                 <tr>
-                    <th scope="col">{{ count.value }}</th>
+                    <td  data = "{{ transaktion.quote_id }}" >{{ count.value }}</td>
                     {% set count.value = count.value + 1 %}
-                    <td>{{ transaktion.tr_date }}</td>
-                    <td>
+                    <td data = "{{ transaktion.tr_date }}">{{ transaktion.tr_date }}</td>
+                    <td data = "{{ transaktion.tr_name }}">
                         <input name="tr_name" style="width: 270px" type="text" value="{{ transaktion.tr_name }}">
                         <input name="tr_quote_id" style="display: none" value="{{ transaktion.quote_id }}">
                     </td>
-                    <td>
+                    <td data = "{{ transaktion.tr_amount }}">
                         {% if transaktion.tr_amount|float < 0.0 %}
-                            {#                        <div style="color: red; text-align: right">{{ '{:,}'.format(transaktion.tr_amount|float).replace(',', ' ') }}</div>#}
-                            <div class="amount_" style="color: red; text-align: right">{{ transaktion.tr_amount }}</div>
+                             <div style="color: red; text-align: right">{{ '{:,}'.format(transaktion.tr_amount|float).replace(',', ' ') }}</div>
                         {% else %}
-                            <div class="amount_"
-                                 style="color: aquamarine; text-align: right">{{ transaktion.tr_amount }}</div>{% endif %}
-                        {#                        <div style="color: aquamarine; text-align: right">{{ '{:,}'.format(transaktion.tr_amount|float).replace(',', ' ') }}</div>{% endif %}#}
+                            <div style="color: aquamarine; text-align: right">{{ '{:,}'.format(transaktion.tr_amount|float).replace(',', ' ') }}</div>
+                        {% endif %}
                     </td>
-                    <td style="text-align: right">{{ transaktion.konto_p }}</td>
-                    <td style="text-align: right"><input name="tr_konto_s" style="text-align: right; width: 50px"
+                    <td  style="text-align: right">{{ transaktion.konto_p }}</td>
+                    <td data = "{{ transaktion.konto_s }}" style="text-align: right"><input name="tr_konto_s" style="text-align: right; width: 50px"
                                                          type="text" value="{{ transaktion.konto_s }}"></td>
                     <td>{% if transaktion.konto_s == '1799' or transaktion.konto_s == '1910' %}
                         <div style="color: red">Ej verifierad</div>
@@ -142,11 +101,6 @@
             </tbody>
         </table>
     </form>
-
-
-    <div class="input-group mb-3">
-        <div class=""></div>
-    </div>
 
 
 

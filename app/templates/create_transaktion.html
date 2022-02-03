@@ -16,10 +16,10 @@
 {% block body %}
     <main class="mt-3">
         <div class="mb-3 justify-content-end">
-            <select class="form-select" aria-label="Default select example" id="Bank">
+            <select class="form-select" aria-label="Default select example" id="bank">
                 <option selected value="0">Välj BANK</option>
                 <option value="1">SEB</option>
-                <option value="2">SWED Bank</option>
+                <option value="2">SWEDBANK</option>
                 <option value="3">SVEA Bank</option>
                 <option value="4">Nordea</option>
             </select>
@@ -60,6 +60,7 @@
                         super konto 1935
                     </div>
                 </div>
+                <div id="error_msg" class="mb-3 justify-content-end" style="color: red"></div>
                 <script>
                     let filter_list = {
                         {% for filter in filters %}

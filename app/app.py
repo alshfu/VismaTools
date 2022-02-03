@@ -54,10 +54,10 @@ def add_to_db():  # put application's code here
                                            konto_p=konto_p)
                 session.add(transaktion)
                 session.commit()
-            return render_template("create_transaktion.html")
+            return redirect(url_for('get_list_of_statements'))
         except Exception as e:
             print(e)
-        return render_template("create_transaktion.html")
+            return render_template("create_transaktion.html")
     else:
         return render_template("create_transaktion.html", filters=filters)
 
@@ -67,8 +67,7 @@ def add_to_db():  # put application's code here
 def transaktions_list(statements_id):
     statements = session.query(BankStatement).get(statements_id)
     transaktions = session.query(Transaktions).filter_by(bank_statement_id=statements_id)
-    # print(statements.title)
-    # print(transaktions[0])
+
     if request.method == 'POST':
         try:
             for index_ in range(len(request.form.getlist('tr_quote_id'))):

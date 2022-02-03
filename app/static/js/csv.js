@@ -1,3 +1,7 @@
+function replaceAll(string, search, replace) {
+  return string.split(search).join(replace);
+}
+
 function tr_filter(tr_name, tr_amount) {
     let a = 1930
     let b = 1799
@@ -52,7 +56,7 @@ function createARow(tr_date, tr_name, tr_amount, tr_id) {
     input_tr_date.readOnly = "readonly"
 
     //transaktion Name
-    const input_tr_name = new_input(tr_name, 'form-control col-lg justify-content-center', 'tr_name')
+    const input_tr_name = new_input(tr_name.replace('"', ''), 'form-control col-lg justify-content-center', 'tr_name')
     input_tr_name.style.textAlign = 'center'
 
     //transaktion amount
@@ -61,7 +65,7 @@ function createARow(tr_date, tr_name, tr_amount, tr_id) {
 
     //transaktion konto
     const konto = tr_filter(tr_name, tr_amount, input_tr_name)
-    console.log(tr_name + ' ' + konto[1])
+    // console.log(tr_name + ' ' + konto[1])
 
     const input_tr_konto_primary = new_input(konto[0], 'input-group-text col-sm-1 justify-content-start', 'konto_p');
     input_tr_konto_primary.readOnly = "readonly"
@@ -116,13 +120,87 @@ function SEB(data) {
     // console.table(data)
     let tr_id = 0
     for (const line of data) {
-        if (tr_id == 0)
-            document.getElementById('summary').value = accounting.formatMoney(parseInt(line[5]), "Kr", 2, " ", ",", "%v %s"); // €4.999,99()
         const line_array = line.toString().split(',')
-        if (line_array[4] != undefined) {
-            createARow(line_array[0], line_array[3], line_array[4], tr_id)
+        if (tr_id == 0) document.getElementById('summary').value = accounting.formatMoney(parseInt(line[5]), "Kr", 2, " ", ",", "%v %s"); // €4.999,99()
+        if (line_array.length === 6) {
+            if (line_array[4] != undefined) {
+                createARow(line_array[0], replaceAll(line_array[3],'"',''), line_array[4], tr_id)
+            }
+        } else {
+            let msg_error = document.createElement('div')
+            msg_error.innerHTML = "OBS!!! hittad fel i line " + tr_id + " | " + line + "<br>"
+            document.getElementById('error_msg').appendChild(msg_error)
         }
 
+
+        tr_id++
+    }
+    move_submit_button()
+}
+
+function SWEDBANK(data) {
+    data.shift()
+    document.getElementById('summary')
+    // console.table(data)
+    let tr_id = 0
+    for (const line of data) {
+        const line_array = line.toString().split(',')
+        if (tr_id == 0) document.getElementById('summary').value = accounting.formatMoney(parseInt(line[11]), "Kr", 2, " ", ",", "%v %s"); // €4.999,99()
+        if (line_array.length === 12) {
+            if (line_array[4] != undefined) {
+                createARow(line_array[7], replaceAll(line_array[8],'"',''), line_array[10], tr_id)
+            }
+        } else {
+            let msg_error = document.createElement('div')
+            msg_error.innerHTML = "OBS!!! hittad fel i line " + tr_id + " | " + line + "<br>"
+            document.getElementById('error_msg').appendChild(msg_error)
+        }
+        tr_id++
+    }
+    move_submit_button()
+}
+
+function SVEA(data) {
+    data.shift()
+    document.getElementById('summary')
+    // console.table(data)
+    let tr_id = 0
+    for (const line of data) {
+        const line_array = line.toString().split(';')
+        if (tr_id == 0) document.getElementById('summary').value = accounting.formatMoney(parseInt(replaceAll(line_array[4],'"','')), "Kr", 2, " ", ",", "%v %s"); // €4.999,99()
+        if (line_array.length === 5) {
+            if (line_array[4] != undefined) {
+                createARow(replaceAll(line_array[0],'"',''), replaceAll(line_array[1],'"',''), replaceAll(replaceAll(line_array[2],'"',''),',','.'), tr_id)
+
+            }
+        } else {
+            let msg_error = document.createElement('div')
+            msg_error.innerHTML = "OBS!!! hittad fel i line " + tr_id + " | " + line + "<br>"
+            document.getElementById('error_msg').appendChild(msg_error)
+        }
+        tr_id++
+    }
+    move_submit_button()
+}
+
+function NORDEA(data) {
+    data.shift()
+    document.getElementById('summary')
+    // console.table(data)
+    let tr_id = 0
+    for (const line of data) {
+        const line_array = line.toString().split(';')
+        if (tr_id == 0) document.getElementById('summary').value = accounting.formatMoney(parseInt(replaceAll(line_array[8],'"','')), "Kr", 2, " ", ",", "%v %s"); // €4.999,99()
+        if (line_array.length === 10) {
+            if (line_array[4] != undefined) {
+                createARow(line_array[0],replaceAll(line_array[5],'"',''),replaceAll(line_array[1],',','.'), tr_id)
+
+            }
+        } else {
+            let msg_error = document.createElement('div')
+            msg_error.innerHTML = "OBS!!! hittad fel i line " + tr_id + " | " + line + "<br>"
+            document.getElementById('error_msg').appendChild(msg_error)
+        }
         tr_id++
     }
     move_submit_button()
@@ -138,7 +216,7 @@ uploadDealcsv.prototype.getCsv = function (e) {
     main_bank_account.addEventListener('change', function () {
         let konto_p = document.getElementsByName('konto_p')
         for (let elem of konto_p) {
-            console.log(elem.value)
+            // console.log(elem.value)
             elem.value = main_bank_account.value
         }
     })
@@ -173,8 +251,16 @@ uploadDealcsv.prototype.getParsecsvdata = function (data) {
         parsedata.push(newLinebrk[i].split(","))
     }
     document.getElementById('action_form').style.display = ''
-
-    SEB(parsedata)
+    let bank = parseInt(document.getElementById('bank').value)
+    console.log(typeof (bank))
+    if (bank === 0 || bank === 1) //SEB
+        SEB(parsedata)
+    else if (bank === 2) //SWEDBANK
+        SWEDBANK(parsedata)
+    else if (bank === 3) //SVEA Bank
+        SVEA(parsedata)
+    else if (bank === 4) //Nordea
+        NORDEA(parsedata)
 
 
     // console.table(parsedata);
