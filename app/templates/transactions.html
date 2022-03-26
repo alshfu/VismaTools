@@ -62,40 +62,51 @@
                 <th style="text-align: right" scope="col">Huvud konto</th>
                 <th style="text-align: right" scope="col">Konto två</th>
                 <th scope="col">Verifierad</th>
-                <th scope="col">Underlag</th>
+                <th scope="col">Moms</th>
+                <th scope="col">Uppdatera</th>
             </tr>
             </thead>
             <tbody>
             {% set count = namespace(value=1) %}
             {% for transaktion in transaktions %}
                 <tr>
-                    <td  data = "{{ transaktion.quote_id }}" >{{ count.value }}</td>
+                    <td data="{{ transaktion.quote_id }}">{{ count.value }}</td>
                     {% set count.value = count.value + 1 %}
-                    <td data = "{{ transaktion.tr_date }}">{{ transaktion.tr_date }}</td>
-                    <td data = "{{ transaktion.tr_name }}">
+                    <td data="{{ transaktion.tr_date }}">{{ transaktion.tr_date }}</td>
+                    <td data="{{ transaktion.tr_name }}">
                         <input name="tr_name" style="width: 270px" type="text" value="{{ transaktion.tr_name }}">
                         <input name="tr_quote_id" style="display: none" value="{{ transaktion.quote_id }}">
                     </td>
-                    <td data = "{{ transaktion.tr_amount }}">
+                    <td data="{{ transaktion.tr_amount }}">
                         {% if transaktion.tr_amount|float < 0.0 %}
-                             <div style="color: red; text-align: right">{{ '{:,}'.format(transaktion.tr_amount|float).replace(',', ' ') }}</div>
+                            <div style="color: red; text-align: right">{{ '{:,}'.format(transaktion.tr_amount|float).replace(',', ' ') }}</div>
                         {% else %}
                             <div style="color: aquamarine; text-align: right">{{ '{:,}'.format(transaktion.tr_amount|float).replace(',', ' ') }}</div>
                         {% endif %}
                     </td>
-                    <td  style="text-align: right">{{ transaktion.konto_p }}</td>
-                    <td data = "{{ transaktion.konto_s }}" style="text-align: right"><input name="tr_konto_s" style="text-align: right; width: 50px"
-                                                         type="text" value="{{ transaktion.konto_s }}"></td>
+                    <td style="text-align: right">{{ transaktion.konto_p }}</td>
+                    <td data="{{ transaktion.konto_s }}" style="text-align: right"><input name="tr_konto_s"
+                                                                                          style="text-align: right; width: 50px"
+                                                                                          type="text"
+                                                                                          value="{{ transaktion.konto_s }}">
+                    </td>
                     <td>{% if transaktion.konto_s == '1799' or transaktion.konto_s == '1910' %}
                         <div style="color: red">Ej verifierad</div>
                     {% else %}
                         <div style="color: greenyellow">Verifierad</div>
                     {% endif %}
                     </td>
+                    <td><select name="moms" id="moms">
+                        <option value="0">Ej</option>
+                        <option value="1">25 %</option>
+                        <option value="2">12 %</option>
+                        <option value="3">6 %</option>
+                    </select></td>
+
+                    {# <td><a href="#"><i class="fa fa-file"></i></a></td> #}
                     <td>
                         <button type="submit"><i class="fa fa-refresh"></i></button>
                     </td>
-                    <td><a href="#"><i class="fa fa-file"></i></a></td>
                 </tr>
             {% endfor %}
             </tbody>

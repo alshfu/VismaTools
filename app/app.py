@@ -1,11 +1,11 @@
 import os
 import re
 
-from flask import Flask, render_template, request, redirect, url_for, send_from_directory
-from flask import send_file
+from flask import Flask, render_template, request, redirect, url_for, send_from_directory, send_file
 from sqlalchemy import create_engine
 from sqlalchemy import desc
 from sqlalchemy.orm import sessionmaker
+
 from database_setup import Base, BankStatement, Transaktions, Settings
 
 app = Flask(__name__)
@@ -119,7 +119,7 @@ def create_se_file(statements_id):
                     amount_s = amount_p.replace('-', '')
                 else:
                     amount_s = f"""-{amount_p}"""
-                f.write(f"""#VER A {i} {s_date} {transaktion.tr_name} {tr_date}
+                f.write(f"""#VER A {i} {tr_date} {transaktion.tr_name} {tr_date}
 {{
    #TRANS {transaktion.konto_p} {{}} {amount_p}
    #TRANS {transaktion.konto_s} {{}} {amount_s}

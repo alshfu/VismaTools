@@ -41,6 +41,7 @@ class Transaktions(Base):
     tr_amount = Column(String(128), default=datetime.utcnow(), comment='amount')
     konto_p = Column(String(128), default=datetime.utcnow(), comment='Primary konto')
     konto_s = Column(String(128), default=datetime.utcnow(), comment='Secondary konto')
+    moms = Column(String(1), default=datetime.utcnow(), comment='Moms')
 
     def __repr__(self):
         return f'{self.tr_name} {self.bank_statement_id}'
