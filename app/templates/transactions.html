@@ -96,12 +96,27 @@
                         <div style="color: greenyellow">Verifierad</div>
                     {% endif %}
                     </td>
-                    <td><select name="moms" id="moms">
-                        <option value="0">Ej</option>
-                        <option value="1">25 %</option>
-                        <option value="2">12 %</option>
-                        <option value="3">6 %</option>
-                    </select></td>
+                    <td>
+                        <select name="tr_moms" id="moms">
+
+                            <option value="0"
+                                    {% if transaktion.moms == '0' %}
+                                    selected="selected"
+                                    {% endif %}>Ej</option>
+                        <option value="1"
+                                    {% if transaktion.moms == '1' %}
+                                    selected="selected"
+                                    {% endif %}>25 %</option>
+                        <option value="2"
+                                    {% if transaktion.moms == '2' %}
+                                    selected="selected"
+                                    {% endif %}>12 %</option>
+                        <option value="3"
+                                    {% if transaktion.moms == '3' %}
+                                    selected="selected"
+                                    {% endif %}>6 %</option>
+                        </select>
+                    </td>
 
                     {# <td><a href="#"><i class="fa fa-file"></i></a></td> #}
                     <td>
