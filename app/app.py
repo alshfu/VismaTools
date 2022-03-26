@@ -66,7 +66,8 @@ def add_to_db():  # put application's code here
 @app.route('/transactions/<int:statements_id>', methods=['POST', 'GET'])
 def transaktions_list(statements_id):
     statements = session.query(BankStatement).get(statements_id)
-    transaktions = session.query(Transaktions).filter_by(bank_statement_id=statements_id)
+    transaktions = session.query(Transaktions).filter_by(bank_statement_id=statements_id).order_by(
+        desc(Transaktions.quote_id))
 
     if request.method == 'POST':
         try:
@@ -93,7 +94,8 @@ def create_se_file(statements_id):
     cwd = os.getcwd() + "/app/SE"  # Get the current working directory (cwd)
     # cwd = "SE"  # For Windows 2019 Server
     statements = session.query(BankStatement).get(statements_id)
-    transaktions = session.query(Transaktions).filter_by(bank_statement_id=statements_id)
+    transaktions = session.query(Transaktions).filter_by(bank_statement_id=statements_id).order_by(
+        desc(Transaktions.quote_id))
     file_header = f'''#FLAGGA 0
 #FORMAT PC8
 #SIETYP 4

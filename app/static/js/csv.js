@@ -1,5 +1,5 @@
 function replaceAll(string, search, replace) {
-  return string.split(search).join(replace);
+    return string.split(search).join(replace);
 }
 
 function tr_filter(tr_name, tr_amount) {
@@ -124,7 +124,7 @@ function SEB(data) {
         if (tr_id == 0) document.getElementById('summary').value = accounting.formatMoney(parseInt(line[5]), "Kr", 2, " ", ",", "%v %s"); // €4.999,99()
         if (line_array.length === 6) {
             if (line_array[4] != undefined) {
-                createARow(line_array[0], replaceAll(line_array[3],'"',''), line_array[4], tr_id)
+                createARow(line_array[0], replaceAll(line_array[3], '"', ''), line_array[4], tr_id)
             }
         } else {
             let msg_error = document.createElement('div')
@@ -148,7 +148,7 @@ function SWEDBANK(data) {
         if (tr_id == 0) document.getElementById('summary').value = accounting.formatMoney(parseInt(line[11]), "Kr", 2, " ", ",", "%v %s"); // €4.999,99()
         if (line_array.length === 12) {
             if (line_array[4] != undefined) {
-                createARow(line_array[7], replaceAll(line_array[8],'"',''), line_array[10], tr_id)
+                createARow(line_array[7], replaceAll(line_array[8], '"', ''), line_array[10], tr_id)
             }
         } else {
             let msg_error = document.createElement('div')
@@ -167,10 +167,10 @@ function SVEA(data) {
     let tr_id = 0
     for (const line of data) {
         const line_array = line.toString().split(';')
-        if (tr_id == 0) document.getElementById('summary').value = accounting.formatMoney(parseInt(replaceAll(line_array[4],'"','')), "Kr", 2, " ", ",", "%v %s"); // €4.999,99()
+        if (tr_id == 0) document.getElementById('summary').value = accounting.formatMoney(parseInt(replaceAll(line_array[4], '"', '')), "Kr", 2, " ", ",", "%v %s"); // €4.999,99()
         if (line_array.length === 5) {
             if (line_array[4] != undefined) {
-                createARow(replaceAll(line_array[0],'"',''), replaceAll(line_array[1],'"',''), replaceAll(replaceAll(line_array[2],'"',''),',','.'), tr_id)
+                createARow(replaceAll(line_array[0], '"', ''), replaceAll(line_array[1], '"', ''), replaceAll(replaceAll(line_array[2], '"', ''), ',', '.'), tr_id)
 
             }
         } else {
@@ -190,10 +190,33 @@ function NORDEA(data) {
     let tr_id = 0
     for (const line of data) {
         const line_array = line.toString().split(';')
-        if (tr_id == 0) document.getElementById('summary').value = accounting.formatMoney(parseInt(replaceAll(line_array[8],'"','')), "Kr", 2, " ", ",", "%v %s"); // €4.999,99()
+        if (tr_id == 0) document.getElementById('summary').value = accounting.formatMoney(parseInt(replaceAll(line_array[8], '"', '')), "Kr", 2, " ", ",", "%v %s"); // €4.999,99()
         if (line_array.length === 10) {
             if (line_array[4] != undefined) {
-                createARow(line_array[0],replaceAll(line_array[5],'"',''),replaceAll(line_array[1],',','.'), tr_id)
+                createARow(line_array[0], replaceAll(line_array[5], '"', ''), replaceAll(line_array[1], ',', '.'), tr_id)
+
+            }
+        } else {
+            let msg_error = document.createElement('div')
+            msg_error.innerHTML = "OBS!!! hittad fel i line " + tr_id + " | " + line + "<br>"
+            document.getElementById('error_msg').appendChild(msg_error)
+        }
+        tr_id++
+    }
+    move_submit_button()
+}
+
+function MARGINAL(data) {
+    data.shift()
+    document.getElementById('summary')
+    // console.table(data)
+    let tr_id = 0
+    for (const line of data) {
+        const line_array = line.toString().split(';')
+        if (tr_id == 0) document.getElementById('summary').value = accounting.formatMoney(parseInt(replaceAll(line_array[3], '"', '')), "Kr", 2, " ", ",", "%v %s"); // €4.999,99()
+        if (line_array.length === 4) {
+            if (line_array[3] != undefined) {
+                createARow(line_array[0], replaceAll(line_array[1], '"', ''), replaceAll(line_array[2], ',', '.'), tr_id)
 
             }
         } else {
@@ -261,6 +284,8 @@ uploadDealcsv.prototype.getParsecsvdata = function (data) {
         SVEA(parsedata)
     else if (bank === 4) //Nordea
         NORDEA(parsedata)
+    else if (bank === 5) //Nordea
+        MARGINAL(parsedata)
 
 
     // console.table(parsedata);
