@@ -113,15 +113,27 @@ def create_se_file(statements_id):
         f = open(file_name, 'w')
         f.write(file_header)
         for transaktion in transaktions:
-            s_date = statements.date[0:10].replace('-', '')
             tr_date = transaktion.tr_date[0:10].replace('-', '')
             amount_p = transaktion.tr_amount
+            moms = transaktion.moms
+            # TO do moms kalkbyl
             try:
                 if float(amount_p) < 0:
                     amount_s = amount_p.replace('-', '')
+                    if moms == "1":
+                        vat = float(amount_s) * 0.2
+                        vat = round(vat, 2)
+                        ex_vat = float(amount_s) - vat
+                        print(f"amount = {amount_s} moms = {vat} amount.ex.moms = {ex_vat}")
                 else:
                     amount_s = f"""-{amount_p}"""
+                    if moms == "1":
+                        vat = float(amount_p) * 0.2
+                        vat = round(vat, 2)
+                        ex_vat = float(amount_p) * 0.8
+                        print(f"amount = {amount_p} moms = {vat} amount.ex.moms = {ex_vat}")
                 f.write(f"""#VER A {i} {tr_date} {transaktion.tr_name} {tr_date}
+                
 {{
    #TRANS {transaktion.konto_p} {{}} {amount_p}
    #TRANS {transaktion.konto_s} {{}} {amount_s}
