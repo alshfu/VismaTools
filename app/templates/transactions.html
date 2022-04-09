@@ -23,9 +23,26 @@
         <div class="input-group-prepend">
             <span class="input-group-text" id="basic-addon3">{{ statements.summary }}</span>
         </div>
+        <div class="input-group-prepend">
+            <button type="button" class="btn btn-warning">Verifiera med AI</button>
+            <script>
+                let filter_list = {
+                    {% for filter in filters %}
+                        "{{filter.quote_id}}":
+                            [
+                                {
+                                    "konto": "{{ filter.konto }}",
+                                    "filter_str": "{{ filter.filter }}"
+                                }
+                            ],
+                    {% endfor %}
+                }
+            </script>
+        </div>
+
     </div>
-    <div><a href="/transactions/se/{{ statements.bank_statement_id }}">Ladda ner SE fil</a></div>
     <div>Skapa Visma SE file</div>
+    <div><a href="/transactions/se/{{ statements.bank_statement_id }}">Ladda ner SE fil</a></div>
     <script>
         const amount_array = document.getElementsByClassName("amount_")
         document.addEventListener('DOMContentLoaded', () => {
@@ -102,19 +119,23 @@
                             <option value="0"
                                     {% if transaktion.moms == '0' %}
                                     selected="selected"
-                                    {% endif %}>Ej</option>
-                        <option value="1"
+                                    {% endif %}>Ej
+                            </option>
+                            <option value="1"
                                     {% if transaktion.moms == '1' %}
                                     selected="selected"
-                                    {% endif %}>25 %</option>
-                        <option value="2"
+                                    {% endif %}>25 %
+                            </option>
+                            <option value="2"
                                     {% if transaktion.moms == '2' %}
                                     selected="selected"
-                                    {% endif %}>12 %</option>
-                        <option value="3"
+                                    {% endif %}>12 %
+                            </option>
+                            <option value="3"
                                     {% if transaktion.moms == '3' %}
                                     selected="selected"
-                                    {% endif %}>6 %</option>
+                                    {% endif %}>6 %
+                            </option>
                         </select>
                     </td>
 

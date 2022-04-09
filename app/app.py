@@ -1,19 +1,14 @@
 import os
-import re
-
-from flask import Flask, render_template, request, redirect, url_for, send_from_directory, send_file
-from sqlalchemy import create_engine
-from sqlalchemy import desc
-from sqlalchemy.orm import sessionmaker
-
-from database_setup import Base, BankStatement, Transaktions, Settings
+from flask import Flask, render_template, send_from_directory
+import request
+import create_transaktion
+import transactions
+import make_SE_file
+import bank_statements
+import clean_db
+import settings
 
 app = Flask(__name__)
-engine = create_engine('sqlite:///vismatools.db?check_same_thread=False')
-Base.metadata.bind = engine
-Base.metadata.create_all(engine)
-DBSession = sessionmaker(bind=engine)
-session = DBSession()
 
 
 @app.route('/favicon.ico')
@@ -29,201 +24,62 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/create_transaktion', methods=['POST', 'GET'])
-def add_to_db():  # put application's code here
-    filters = session.query(Settings).all()
-    if request.method == 'POST':
-        title = request.form['title']
-        summary = request.form['summary']
-        statement = BankStatement(title=title, summary=summary)
-        session.add(statement)
-        session.flush()
-        try:
-            for id_ in request.form.getlist('tr_id'):
-                id_ = int(id_)
-                tr_date = request.form.getlist('tr_date')[id_]
-                tr_name = request.form.getlist('tr_name')[id_]
-                tr_amount = request.form.getlist('tr_amount')[id_]
-                konto_p = request.form.getlist('konto_p')[id_]
-                konto_s = request.form.getlist('konto_s')[id_]
-                transaktion = Transaktions(bank_statement_id=statement.bank_statement_id,
-                                           tr_date=tr_date,
-                                           tr_name=tr_name,
-                                           tr_amount=tr_amount,
-                                           konto_s=konto_s,
-                                           konto_p=konto_p)
-                session.add(transaktion)
-                session.commit()
-            return redirect(url_for('get_list_of_statements'))
-        except Exception as e:
-            print(e)
-            return render_template("create_transaktion.html")
-    else:
-        return render_template("create_transaktion.html", filters=filters)
+@app.route('/csv_reader', methods=['POST', 'GET'])
+def csv_reader():
+    return create_transaktion.add_to_db()
 
 
 # Transaktions page
 @app.route('/transactions/<int:statements_id>', methods=['POST', 'GET'])
-def transaktions_list(statements_id):
-    statements = session.query(BankStatement).get(statements_id)
-    transaktions = session.query(Transaktions).filter_by(bank_statement_id=statements_id).order_by(
-        desc(Transaktions.quote_id))
-
-    if request.method == 'POST':
-        try:
-            for index_ in range(len(request.form.getlist('tr_quote_id'))):
-                tr_id = request.form.getlist('tr_quote_id')[index_]
-                tr_name = request.form.getlist('tr_name')[index_]
-                konto_s = request.form.getlist('tr_konto_s')[index_]
-                # transaktion = session.query(Transaktions).filter_by(quote_id=tr_id)
-                transaktion = session.query(Transaktions).get(tr_id)
-                transaktion.tr_name = tr_name
-                transaktion.konto_s = konto_s
-                transaktion.moms = request.form.getlist('tr_moms')[index_]
-                session.commit()
-                print(request.form.getlist('tr_moms')[index_])
-            return redirect(url_for('transaktions_list', statements_id=statements_id))
-        except Exception as e:
-            print(e)
-            return redirect(url_for('transaktions_list', statements_id=statements_id))
-
-    return render_template('transactions.html', statements=statements, transaktions=transaktions)
+def transaktions_by_id(statements_id):
+    return transactions.transaktions_list(statements_id)
 
 
 @app.route('/transactions/se/<int:statements_id>')
 def create_se_file(statements_id):
-    import os
-    cwd = os.getcwd() + "/app/SE"  # Get the current working directory (cwd)
-    # cwd = "SE"  # For Windows 2019 Server
-    statements = session.query(BankStatement).get(statements_id)
-    transaktions = session.query(Transaktions).filter_by(bank_statement_id=statements_id).order_by(
-        desc(Transaktions.quote_id))
-    file_header = f'''#FLAGGA 0
-#FORMAT PC8
-#SIETYP 4
-#PROGRAM "Visma Administration 2000" 2020.3
-#GEN 20211229 
-#FNAMN "{statements.title}"
-#TAXAR 2022 
-#VALUTA SEK'''
-    i = 1
-    try:
-        file_name = f"""{cwd}/{statements.title.replace(' ', '')}.SE"""
-        print(file_name)
-        f = open(file_name, 'w')
-        f.write(file_header)
-        for transaktion in transaktions:
-            tr_date = transaktion.tr_date[0:10].replace('-', '')
-            amount_p = transaktion.tr_amount
-            moms = transaktion.moms
-            # TO do moms kalkbyl
-            try:
-                if float(amount_p) < 0:
-                    amount_s = amount_p.replace('-', '')
-                    if moms == "1":
-                        vat = float(amount_s) * 0.2
-                        vat = round(vat, 2)
-                        ex_vat = float(amount_s) - vat
-                        print(f"amount = {amount_s} moms = {vat} amount.ex.moms = {ex_vat}")
-                else:
-                    amount_s = f"""-{amount_p}"""
-                    if moms == "1":
-                        vat = float(amount_p) * 0.2
-                        vat = round(vat, 2)
-                        ex_vat = float(amount_p) * 0.8
-                        print(f"amount = {amount_p} moms = {vat} amount.ex.moms = {ex_vat}")
-                f.write(f"""#VER A {i} {tr_date} {transaktion.tr_name} {tr_date}
-                
-{{
-   #TRANS {transaktion.konto_p} {{}} {amount_p}
-   #TRANS {transaktion.konto_s} {{}} {amount_s}
-}}
-""")
-                i = i + 1
-            except Exception as e:
-                print(e)
-        f.close()
-        return send_file(file_name, as_attachment=True)
-    except Exception as e:
-        print(e)
-        return redirect(url_for('get_list_of_statements'))
+    return make_SE_file.create_se_file(statements_id)
 
 
 # Statements list page
 @app.route('/bank_statements')
-def get_list_of_statements():
-    statements = session.query(BankStatement).order_by(desc(BankStatement.bank_statement_id)).all()
-    return render_template('bank_statements.html', statements=statements)
+def statements():
+    return bank_statements.get_list_of_statements()
 
 
 @app.route('/bank_statements/<int:statement_id>/delete', methods=['GET'])
 def remove_statement(statement_id):
-    statement_to_delete = session.query(BankStatement).filter_by(bank_statement_id=statement_id).one()
-    if request.method == 'GET':
-        import os
-        cwd = os.getcwd() + "/app/SE"
-        file_name = f"""{cwd}/{statement_to_delete.title.replace(' ', '')}.SE"""
-        print(file_name)
-        if os.path.exists(file_name):
-            print(file_name)
-            os.remove(file_name)
-        session.delete(statement_to_delete)
-        session.commit()
-        return redirect(url_for('get_list_of_statements'))
-    else:
-        return redirect(url_for('get_list_of_statements'))
+    return clean_db.remove_statement(statement_id)
 
 
 # Settings page
 @app.route('/settings', methods=['POST', 'GET'])
 def show_settings():
-    settings_list = session.query(Settings).all()
-    # # TODO utföra kontroll av duplicering i konto_n   så att de kopplas ihop
-    return render_template('settings.html', settings=settings_list)
+    return settings.view_settings()
 
 
 @app.route('/settings/new', methods=['POST', 'GET'])
 def new_setting():
-    # TODO utföra kontroll av duplicering i konto_n   så att de kopplas ihop
-    if request.method == 'POST':
-        new_filter = Settings(konto=request.form['konto_n'], filter=request.form['filter_list'])
-        session.add(new_filter)
-        session.commit()
-        return redirect(url_for('show_settings'))
-    else:
-        return render_template('settings.html')
+    return settings.create_new_filter()
 
 
 @app.route("/settings/<int:setting_id>/edit/", methods=['GET', 'POST'])
 def update_setting(setting_id):
-    filters = request.form['filter_list']
-    filters = re.sub(r"[\n\t\s]*", "", filters)
-
-    print(setting_id)
-    if request.method == 'POST':
-        if request.form['konto_n']:
-            setting = session.query(Settings).get(setting_id)
-            setting.filter = filters
-            session.commit()
-            return redirect(url_for('show_settings'))
-    else:
-        return render_template('settings.html')
+    return settings.update_filter(setting_id)
 
 
 @app.route('/settings/<int:setting_id>/delete/', methods=['GET', 'POST'])
 def delete_setting(setting_id):
-    setting_to_delete = session.query(Settings).filter_by(quote_id=setting_id).one()
-    if request.method == 'GET':
-        session.delete(setting_to_delete)
-        session.commit()
-        return redirect(url_for('show_settings'))
-    else:
-        return redirect(url_for('show_settings'))
+    return settings.remove_filter(setting_id)
 
 
 @app.route('/about')
 def about():  # put application's code here
     return render_template("about.html")
+
+
+@app.route('/vat')
+def moms():  # räkna ut moms
+    return render_template("moms.html")
 
 
 if __name__ == "__main__":

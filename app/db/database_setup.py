@@ -1,9 +1,16 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, Text, Date, DateTime, create_engine
+from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 
 Base = declarative_base()
+
+engine = create_engine('sqlite:///vismatools.db?check_same_thread=False')
+Base.metadata.bind = engine
+Base.metadata.create_all(engine)
+DBSession = sessionmaker(bind=engine)
+session = DBSession()
 
 
 class BankStatement(Base):

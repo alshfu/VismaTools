@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Momskalkylator
+{% endblock %}
+
+{% block body %}
+    <div class="row  mt-2 mb-2">
+
+        <div class="col-md-12 mt-3 mb-3">
+            <h3> Momskalkylator</h3>
+            <div id="label-for-momsrate">Momssats:</div>
+            <select id="momsrate">
+                <option value="0.25">25%</option>
+                <option value="0.12">12%</option>
+                <option value="0.06">6%</option>
+            </select>
+        </div>
+        <div class="col-md-12 mb-4">
+            <form>
+                <div class="form-row">
+                    <div class="col-sm-4 mt-1">
+                        Pris utan Moms:
+                        <input type="text" class="form-control calcUtan" id="calcUtan" onchange="calcU()">
+                        <div id="error2"></div>
+                    </div>
+                    <div class="col-sm-4 mt-1">
+                        Summa moms:
+                        <input type="text" class="form-control momsen" placeholder="" id="momsen" onchange="calcM()">
+                    </div>
+                    <div class="col-sm-4 mt-1">
+                        Pris med Moms:
+                        <input type="text" class="form-control calcMed" placeholder="" id="calcMed" onchange="calcMe()">
+                        <div id="error1"></div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-12 mb-4">
+            <p class="small">
+                Du kan välja att fylla i vilket fält som helst så räknas de andra ut.<br>
+                Du kan välja momssatsen i rullistan. Där finns alternativen 6 %, 12 % och 25 %<br>
+                OBS! Notera att ingen avrundning sker i räknaren, vid prissättning och fakturering bör det göras.
+            </p>
+        </div>
+    </div>
+    <script>
+
+        let moms_rate = document.getElementById("momsrate")
+        let ex_moms = document.getElementById("calcUtan")
+        let moms = document.getElementById("momsen")
+        let ink_moms = document.getElementById("calcMed")
+
+        ex_moms.addEventListener('input', calcU)
+        moms.addEventListener("input", calcM)
+        ink_moms.addEventListener('input', calcMe)
+
+        let moms_rate_value, ex_moms_value, moms_value, ink_moms_value
+
+        function get_value() {
+            moms_rate_value = parseFloat(moms_rate.value)
+            ex_moms_value = parseFloat(ex_moms.value)
+            moms_value = parseFloat(moms.value)
+            ink_moms_value = parseFloat(ink_moms.value)
+            console.table([moms_rate_value.toFixed(2),ex_moms_value.toFixed(2),moms_value.toFixed(2),ink_moms_value.toFixed(2)])
+        }
+
+
+        function calcU() {
+            get_value()
+            moms.value = (ex_moms_value * moms_rate_value).toFixed(2);
+            ink_moms.value = (ex_moms_value * (1 + moms_rate_value)).toFixed(2);
+        }
+
+        function calcM() {
+            get_value()
+            ex_moms.value = (moms_value * (1 / moms_rate_value)).toFixed(2);
+            ink_moms.value = (moms_value * (1 / moms_rate_value) + moms_value).toFixed(2);
+        }
+
+        function calcMe() {
+            get_value()
+            ex_moms.value = (ink_moms_value / (1 + moms_rate_value)).toFixed(2);
+            moms.value = (ink_moms_value - (ink_moms_value / (1 + moms_rate_value))).toFixed(2);
+        }
+    </script>
+{% endblock %}

@@ -22,11 +22,45 @@
 <div class="container d-flex w-100  p-3 mx-auto flex-column">
     <header class="mb-auto">
         <ul class="nav nav-pills">
-            <li class="nav-item"><a href="/" class="nav-link active" aria-current="page">Home</a></li>
-            <li class="nav-item"><a href="/bank_statements" class="nav-link">Konto utdrag</a></li>
-            <li class="nav-item"><a href="/create_transaktion" class="nav-link">CVS läsare</a></li>
-            <li class="nav-item"><a href="/settings" class="nav-link">Settings</a></li>
-            <li class="nav-item"><a href="/about" class="nav-link">About</a></li>
+            <li class="nav-item"><a href="/"
+                    {% if request.path == "/" %}
+                                    class="active nav-link"
+                    {% else %}
+                                    class="nav-link"
+                    {% endif %}
+                                    aria-current="page">Home</a>
+            </li>
+            <li class="nav-item"><a href="/bank_statements"
+                    {% if request.path == "/bank_statements" %}
+                                    class="active nav-link"
+                    {% else %}
+                                    class="nav-link"
+                    {% endif %}>Konto utdrag</a>
+            </li>
+            <li class="nav-item"><a href="/csv_reader"
+                    {% if request.path == "/csv_reader" %}
+                                    class="active nav-link"
+                    {% else %}
+                                    class="nav-link"
+                    {% endif %}>CVS läsare</a></li>
+            <li class="nav-item"><a href="/settings"
+                    {% if request.path == "/settings" %}
+                                    class="active nav-link"
+                    {% else %}
+                                    class="nav-link"
+                    {% endif %}>Settings</a></li>
+            <li class="nav-item"><a href="/vat"
+                    {% if request.path == "/vat" %}
+                                    class="active nav-link"
+                    {% else %}
+                                    class="nav-link"
+                    {% endif %}>Momskalkylator</a></li>
+            <li class="nav-item"><a href="/about"
+                    {% if request.path == "/about" %}
+                                    class="active nav-link"
+                    {% else %}
+                                    class="nav-link"
+                    {% endif %}>About</a></li>
         </ul>
     </header>
     {% block body %}{% endblock %}

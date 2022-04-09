@@ -2,6 +2,42 @@ function replaceAll(string, search, replace) {
     return string.split(search).join(replace);
 }
 
+String.prototype.hexEncode = function () {
+    var hex, i;
+
+    var result = "";
+    for (i = 0; i < this.length; i++) {
+        hex = this.charCodeAt(i).toString(16);
+        result += ("000" + hex).slice(-4);
+    }
+
+    return result
+}
+
+String.prototype.hexDecode = function () {
+    let j;
+    let hexes = this.match(/.{1,4}/g) || [];
+    let back = "";
+    for (j = 0; j < hexes.length; j++) {
+        back += String.fromCharCode(parseInt(hexes[j], 16));
+    }
+
+    return back;
+}
+
+function encode(str) {
+    str = str.hexEncode()
+    str = replaceAll(str, "00c30085", "00c5")
+    str = replaceAll(str, "00c300a5", "00e5")
+    str = replaceAll(str, "00c30084", "00c4")
+    str = replaceAll(str, "00c300a4", "00e4")
+    str = replaceAll(str, "00c30096", "00d6")
+    str = replaceAll(str, "00c300b6", "00f6")
+    str = str.hexDecode()
+    return str
+}
+
+
 function tr_filter(tr_name, tr_amount) {
     let a = 1930
     let b = 1799
@@ -124,7 +160,7 @@ function SEB(data) {
         if (tr_id == 0) document.getElementById('summary').value = accounting.formatMoney(parseInt(line[5]), "Kr", 2, " ", ",", "%v %s"); // €4.999,99()
         if (line_array.length === 6) {
             if (line_array[4] != undefined) {
-                createARow(line_array[0], replaceAll(line_array[3], '"', ''), line_array[4], tr_id)
+                createARow(line_array[0], encode(replaceAll(line_array[3], '"', '')), line_array[4], tr_id)
             }
         } else {
             let msg_error = document.createElement('div')
@@ -140,6 +176,7 @@ function SEB(data) {
 
 function SWEDBANK(data) {
     data.shift()
+    data.shift()
     document.getElementById('summary')
     // console.table(data)
     let tr_id = 0
@@ -148,7 +185,7 @@ function SWEDBANK(data) {
         if (tr_id == 0) document.getElementById('summary').value = accounting.formatMoney(parseInt(line[11]), "Kr", 2, " ", ",", "%v %s"); // €4.999,99()
         if (line_array.length === 12) {
             if (line_array[4] != undefined) {
-                createARow(line_array[7], replaceAll(line_array[8], '"', ''), line_array[10], tr_id)
+                createARow(line_array[7], encode(replaceAll(line_array[8], '"', '')), line_array[10], tr_id)
             }
         } else {
             let msg_error = document.createElement('div')
@@ -170,7 +207,7 @@ function SVEA(data) {
         if (tr_id == 0) document.getElementById('summary').value = accounting.formatMoney(parseInt(replaceAll(line_array[4], '"', '')), "Kr", 2, " ", ",", "%v %s"); // €4.999,99()
         if (line_array.length === 5) {
             if (line_array[4] != undefined) {
-                createARow(replaceAll(line_array[0], '"', ''), replaceAll(line_array[1], '"', ''), replaceAll(replaceAll(line_array[2], '"', ''), ',', '.'), tr_id)
+                createARow(replaceAll(line_array[0], '"', ''), encode(replaceAll(line_array[1], '"', '')), replaceAll(replaceAll(line_array[2], '"', ''), ',', '.'), tr_id)
 
             }
         } else {
@@ -193,7 +230,7 @@ function NORDEA(data) {
         if (tr_id == 0) document.getElementById('summary').value = accounting.formatMoney(parseInt(replaceAll(line_array[8], '"', '')), "Kr", 2, " ", ",", "%v %s"); // €4.999,99()
         if (line_array.length === 10) {
             if (line_array[4] != undefined) {
-                createARow(line_array[0], replaceAll(line_array[5], '"', ''), replaceAll(line_array[1], ',', '.'), tr_id)
+                createARow(line_array[0], encode(replaceAll(line_array[5], '"', '')), replaceAll(line_array[1], ',', '.'), tr_id)
 
             }
         } else {
@@ -216,7 +253,7 @@ function MARGINAL(data) {
         if (tr_id == 0) document.getElementById('summary').value = accounting.formatMoney(parseInt(replaceAll(line_array[3], '"', '')), "Kr", 2, " ", ",", "%v %s"); // €4.999,99()
         if (line_array.length === 4) {
             if (line_array[3] != undefined) {
-                createARow(line_array[0], replaceAll(line_array[1], '"', ''), replaceAll(line_array[2], ',', '.'), tr_id)
+                createARow(line_array[0], encode(replaceAll(line_array[1], '"', '')), replaceAll(line_array[2], ',', '.'), tr_id)
 
             }
         } else {
@@ -239,7 +276,7 @@ uploadDealcsv.prototype.getCsv = function (e) {
     main_bank_account.addEventListener('change', function () {
         let konto_p = document.getElementsByName('konto_p')
         for (let elem of konto_p) {
-            // console.log(elem.value)
+            console.log(elem.value)
             elem.value = main_bank_account.value
         }
     })
@@ -249,8 +286,8 @@ uploadDealcsv.prototype.getCsv = function (e) {
 
         if (this.files && this.files[0]) {
 
-            var myFile = this.files[0];
-            var reader = new FileReader();
+            let myFile = this.files[0];
+            let reader = new FileReader();
 
             reader.addEventListener('load', function (e) {
 
@@ -270,7 +307,6 @@ uploadDealcsv.prototype.getParsecsvdata = function (data) {
 
     let newLinebrk = data.split("\n");
     for (let i = 0; i < newLinebrk.length; i++) {
-
         parsedata.push(newLinebrk[i].split(","))
     }
     document.getElementById('action_form').style.display = ''
