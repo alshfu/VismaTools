@@ -3,9 +3,9 @@ function replaceAll(string, search, replace) {
 }
 
 String.prototype.hexEncode = function () {
-    var hex, i;
+    let hex, i;
 
-    var result = "";
+    let result = "";
     for (i = 0; i < this.length; i++) {
         hex = this.charCodeAt(i).toString(16);
         result += ("000" + hex).slice(-4);
@@ -327,5 +327,5 @@ uploadDealcsv.prototype.getParsecsvdata = function (data) {
     // console.table(parsedata);
 }
 
-var parseCsv = new uploadDealcsv();
+let parseCsv = new uploadDealcsv();
 parseCsv.getCsv();

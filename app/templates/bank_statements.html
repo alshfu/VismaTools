@@ -26,9 +26,9 @@
                         <td class="col-md-2">{{ statement.summary }}</td>
                         <td class="col-md-2">{{ statement.date[0:10] }}</td>
                         <td class="col-auto">
-                            <a href="/transactions/se/{{ statement.bank_statement_id }}"
+                            <a href="/verifikations/se/{{ statement.bank_statement_id }}"
                                class="btn btn-primary">Skapa SE fil</a>
-                            <a href="/transactions/{{ statement.bank_statement_id }}" class="btn btn-success">Visa</a>
+                            <a href="/verifikations/{{ statement.bank_statement_id }}" class="btn btn-success">Visa</a>
                             <a class="btn btn-primary" href="/bank_statements/{{ statement.bank_statement_id }}/delete" role="button">
                                 <i class="bi bi-trash"> radera </i>
                             </a>

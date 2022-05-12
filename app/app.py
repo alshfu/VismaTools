@@ -1,14 +1,15 @@
 import os
 from flask import Flask, render_template, send_from_directory
-import request
-import create_transaktion
-import transactions
+import csv
+import verifikations
 import make_SE_file
 import bank_statements
 import clean_db
 import settings
+from db.database_setup import Base, engine
 
 app = Flask(__name__)
+Base.metadata.create_all(engine)
 
 
 @app.route('/favicon.ico')
@@ -26,16 +27,16 @@ def index():
 
 @app.route('/csv_reader', methods=['POST', 'GET'])
 def csv_reader():
-    return create_transaktion.add_to_db()
+    return csv.add_to_db()
 
 
 # Transaktions page
-@app.route('/transactions/<int:statements_id>', methods=['POST', 'GET'])
+@app.route('/verifikations/<int:statements_id>', methods=['POST', 'GET'])
 def transaktions_by_id(statements_id):
-    return transactions.transaktions_list(statements_id)
+    return verifikations.transaktions_list(statements_id)
 
 
-@app.route('/transactions/se/<int:statements_id>')
+@app.route('/verifikations/se/<int:statements_id>')
 def create_se_file(statements_id):
     return make_SE_file.create_se_file(statements_id)
 

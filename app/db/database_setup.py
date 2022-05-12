@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, Text, Date, DateTime, create_engine
+from sqlalchemy import Column, ForeignKey, Integer, String, Text, create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
@@ -10,6 +10,7 @@ engine = create_engine('sqlite:///vismatools.db?check_same_thread=False')
 Base.metadata.bind = engine
 Base.metadata.create_all(engine)
 DBSession = sessionmaker(bind=engine)
+
 session = DBSession()
 
 
@@ -49,6 +50,7 @@ class Transaktions(Base):
     konto_p = Column(String(128), default=datetime.utcnow(), comment='Primary konto')
     konto_s = Column(String(128), default=datetime.utcnow(), comment='Secondary konto')
     moms = Column(String(1), default=datetime.utcnow(), comment='Moms')
+    ver_file = Column(Text, default=datetime.utcnow(), comment="Verifikations File")
 
     def __repr__(self):
         return f'{self.tr_name} {self.bank_statement_id}'

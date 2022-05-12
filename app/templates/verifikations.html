@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Transaktion List
+{% endblock %}
+
+{#
+
+#VER A 2 20210104 Bisnode 20210412
+    {
+       #TRANS 1930 {} -253.00
+       #TRANS 1799 {} 253.00
+    }
+#}
+{% block body %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        function openNav(url) {
+            console.log(url)
+            let myNav = document.getElementById("myNav");
+            myNav.style.width = "100%"
+            let iframe = document.createElement('iframe')
+            iframe.style.width = '100%'
+            iframe.style.height = '100%'
+            iframe.src = url
+            myNav.appendChild(iframe)
+        }
+
+        function closeNav() {
+            document.getElementById("myNav").style.width = "0%";
+            let myNav = document.getElementById("myNav");
+            let iframe = document.getElementsByTagName('iframe')[0]
+            myNav.removeChild(iframe)
+        }
+    </script>
+    <strong class="me-auto"></strong>
+    <strong class="me-auto"></strong>
+    <label for="basic-url">Namn och konto balance</label>
+    <div class="input-group mb-3">
+        <input type="text" class="form-control" id="basic-url" aria-describedby="basic-addon3"
+               value="{{ statements.title }}">
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="basic-addon3">{{ statements.summary }}</span>
+        </div>
+        <div class="input-group-prepend">
+            <button
+                    onclick="varify_ai()"
+                    type="button"
+                    class="btn btn-warning">
+                Verifiera med AI
+            </button>
+            <script>
+                let filter_list = {
+                    {% for filter in filters %}
+                        "{{filter.quote_id}}":
+                            [
+                                {
+                                    "konto": "{{ filter.konto }}",
+                                    "filter_str": "{{ filter.filter }}"
+                                }
+                            ],
+                    {% endfor %}
+                }
+            </script>
+            <script src="{{ url_for('static',filename='js/verify.js') }}"></script>
+        </div>
+    </div>
+    <div><a href="/verifikations/se/{{ statements.bank_statement_id }}">Ladda ner SE fil</a></div>
+    <script>
+        const amount_array = document.getElementsByClassName("amount_")
+        document.addEventListener('DOMContentLoaded', () => {
+            const getSort = ({target}) => {
+                let i = 0
+                const order = (target.dataset.order = - (target.dataset.order || -1));
+                const index = [...target.parentNode.cells].indexOf(target);
+                const collator = new Intl.Collator(['en', 'sv'], {numeric: true});
+                const comparator = (index, order) => (a, b) => order * collator.compare(
+                    a.children[index].getAttribute('data'),
+                    b.children[index].getAttribute('data'),
+                );
+                for (const tBody of target.closest('table').tBodies) {
+                    console.log(i++)
+                    tBody.append(...[...tBody.rows].sort(comparator(index, order)));
+                }
+                for (const cell of target.parentNode.cells)
+
+                    cell.classList.toggle('sorted', cell === target);
+            };
+            document.querySelectorAll('.table_sort thead').forEach(tableTH => tableTH.addEventListener('click', () => {
+                getSort(event)
+            }));
+        });
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+
+    </script>
+    <div id="myNav" class="overlay">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <div class="overlay-content">
+
+        </div>
+    </div>
+    <form method="post" enctype="multipart/form-data">
+        <table style="width: 100%; table-layout: auto" class="table_sort  table">
+            <thead>
+            <tr>
+                <th class="fit" scope="col">ID</th>
+                <th class="fit" scope="col">Datum</th>
+                <th class="fit" scope="col">Beskrivning</th>
+                <th class="fit" style="text-align: right" scope="col">Belopp</th>
+                <th class="fit" style="text-align: right" scope="col">Huvud konto</th>
+                <th class="fit" style="text-align: right" scope="col">Konto två</th>
+                <th class="fit" scope="col">Verifierad</th>
+                <th class="fit" scope="col">Moms</th>
+                <th class="fit" scope="col">Uppdatera</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% set count = namespace(value=1) %}
+            {% for transaktion in transaktions %}
+                <tr>
+                    <td class="fit" data="{{ transaktion.quote_id }}">{{ count.value }}</td>
+                    {% set count.value = count.value + 1 %}
+                    <td class="fit" data="{{ transaktion.tr_date }}">{{ transaktion.tr_date }}</td>
+                    <td class="fit" data="{{ transaktion.tr_name }}">
+                        <input class="verification_name" name="tr_name" style="width: 270px" type="text"
+                               value="{{ transaktion.tr_name }}">
+                        <input name="tr_quote_id" style="display: none" value="{{ transaktion.quote_id }}">
+                    </td>
+                    <td data="{{ transaktion.tr_amount }}">
+
+                        {% if transaktion.tr_amount|float < 0.0 %}
+                            <div data="{{ transaktion.tr_amount }}"
+                                 class="verification_amount"
+                                 data-toggle="tooltip"
+                                 data-placement="right"
+                                 title="{{ transaktion.tr_amount }}"
+                                 style="color: red; text-align: right">{{ '{:,}'.format(transaktion.tr_amount|float).replace(',', ' ') }}
+
+                            </div>
+                        {% else %}
+                            <div data="{{ transaktion.tr_amount }}"
+                                 class="verification_amount V"
+                                 data-toggle="tooltip"
+                                 data-placement="right"
+                                 title="Tooltip on right"
+                                 style="color: aquamarine; text-align: right">{{ '{:,}'.format(transaktion.tr_amount|float).replace(',', ' ') }}
+                            </div>
+
+                        {% endif %}
+                        </span>
+                    </td>
+                    <td style="text-align: right">{{ transaktion.konto_p }}</td>
+                    <td data="{{ transaktion.konto_s }}" style="text-align: right">
+                        <input name="tr_konto_s"
+                               class="verification_account"
+                               style="text-align: right; width: 50px"
+                               type="text"
+                               value="{{ transaktion.konto_s }}">
+                    </td>
+                    <td>
+                        {% if transaktion.konto_s == '1799' or transaktion.konto_s == '1910' %}
+                            <div class="verification_status" style="color: red">
+                                <label>
+                                    <i class="fa fa-file"> Verifiera</i>
+                                    <input type="file" style="display: none;" name="tr_file">
+                                </label>
+                            </div>
+                        {% else %}
+                            <div class="verification_status"
+                                 style="color: greenyellow">
+                                <input type="file" style="display: none;" name="tr_file">
+                                <span style="cursor:pointer" onclick="openNav('../{{ transaktion.ver_file }}')">Verifierad</span>
+                            </div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <select name="tr_moms" id="moms">
+
+                            <option value="0"
+                                    {% if transaktion.moms == '0' %}
+                                    selected="selected"
+                                    {% endif %}>Ej
+                            </option>
+                            <option value="1"
+                                    {% if transaktion.moms == '1' %}
+                                    selected="selected"
+                                    {% endif %}>25 %
+                            </option>
+                            <option value="2"
+                                    {% if transaktion.moms == '2' %}
+                                    selected="selected"
+                                    {% endif %}>12 %
+                            </option>
+                            <option value="3"
+                                    {% if transaktion.moms == '3' %}
+                                    selected="selected"
+                                    {% endif %}>6 %
+                            </option>
+                        </select>
+                    </td>
+
+                    {# <td><a href="#"><i class="fa fa-file"></i></a></td> #}
+                    <td>
+
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <button type="submit"><i class="fa fa-refresh"></i></button>
+    </form>
+
+
+
+
+{% endblock %}
