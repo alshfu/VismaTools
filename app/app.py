@@ -30,13 +30,13 @@ def csv_reader():
     return csv.add_to_db()
 
 
-# Transaktions page
-@app.route('/verifikations/<int:statements_id>', methods=['POST', 'GET'])
-def transaktions_by_id(statements_id):
+# Transaction page
+@app.route('/verifications/<int:statements_id>', methods=['POST', 'GET'])
+def transactions_by_id(statements_id):
     return verifikations.transaktions_list(statements_id)
 
 
-@app.route('/verifikations/se/<int:statements_id>')
+@app.route('/verifications/se/<int:statements_id>')
 def create_se_file(statements_id):
     return make_SE_file.create_se_file(statements_id)
 
