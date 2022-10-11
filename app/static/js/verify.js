@@ -1,5 +1,3 @@
-
-
 function auto_verify(verification_name, verification_amount, verification_account, verification_status) {
     verification_amount = parseFloat(verification_amount)
     let value_of_verification_account = parseInt(verification_account.value)
@@ -15,7 +13,7 @@ function auto_verify(verification_name, verification_amount, verification_accoun
                         //(console.log(account + " : " + filter_name+ " -> " + verification_amount)
                         if (verification_name.includes(filter_name)) {
                             //verification_account = account
-                            //console.log(account + " : " + filter_name+ " -> " + verification_amount)
+                            console.log(account + " : " + filter_name+ " -> " + verification_amount)
                             verification_account.value = account
                             verification_status.innerText = "Ny verifierad"
                             verification_status.style.color = "#FFA233"
@@ -26,7 +24,7 @@ function auto_verify(verification_name, verification_amount, verification_accoun
             }
         }
     }
-    //return String(verification_account)
+    return String(verification_account)
 }
 
 function varify_ai() {

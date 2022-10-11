@@ -15,9 +15,8 @@ def transaktions_list(statements_id):
         desc(Transaktions.quote_id))
 
     if request.method == 'POST':
-        print(len(request.form))
         try:
-            for index_ in range(len(request.form)):
+            for index_ in range(len(request.form.getlist('tr_quote_id'))):
                 print(index_)
                 tr_id = request.form.getlist('tr_quote_id')[index_]
                 tr_name = request.form.getlist('tr_name')[index_]
@@ -25,7 +24,7 @@ def transaktions_list(statements_id):
                 tr_file = request.files
                 file = tr_file.getlist('tr_file')[index_]
                 filename = secure_filename(file.filename)
-                transaktion = session.query(Transaktions).filter_by(quote_id=tr_id)
+                # transaktion = session.query(Transaktions).filter_by(quote_id=tr_id)
                 transaktion = session.query(Transaktions).get(tr_id)
                 transaktion.tr_name = tr_name
                 transaktion.konto_s = konto_s

@@ -15,7 +15,7 @@
 {% block body %}
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script>
-        function openNav(url) {
+    function openNav(url) {
             console.log(url)
             let myNav = document.getElementById("myNav");
             myNav.style.width = "100%"
@@ -71,7 +71,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             const getSort = ({target}) => {
                 let i = 0
-                const order = (target.dataset.order = - (target.dataset.order || -1));
+                const order = (target.dataset.order = -(target.dataset.order || -1));
                 const index = [...target.parentNode.cells].indexOf(target);
                 const collator = new Intl.Collator(['en', 'sv'], {numeric: true});
                 const comparator = (index, order) => (a, b) => order * collator.compare(
@@ -109,7 +109,10 @@
                 <th class="fit" scope="col">ID</th>
                 <th class="fit" scope="col">Datum</th>
                 <th class="fit" scope="col">Beskrivning</th>
-                <th class="fit" style="text-align: right" scope="col">Belopp</th>
+                <th class="fit" style="text-align: right" scope="col">ink.moms</th>
+                <th class="fit" style="text-align: right" scope="col">ex.moms</th>
+                <th class="fit" style="text-align: right" scope="col">
+                    moms</th>
                 <th class="fit" style="text-align: right" scope="col">Huvud konto</th>
                 <th class="fit" style="text-align: right" scope="col">Konto två</th>
                 <th class="fit" scope="col">Verifierad</th>
@@ -120,51 +123,57 @@
             <tbody>
             {% set count = namespace(value=1) %}
             {% for transaktion in transaktions %}
-                <tr>
+                <tr class="verification">
                     <td class="fit" data="{{ transaktion.quote_id }}">{{ count.value }}</td>
                     {% set count.value = count.value + 1 %}
                     <td class="fit" data="{{ transaktion.tr_date }}">{{ transaktion.tr_date }}</td>
                     <td class="fit" data="{{ transaktion.tr_name }}">
-                        <input class="verification_name" name="tr_name" style="width: 270px" type="text"
-                               value="{{ transaktion.tr_name }}">
-                        <input name="tr_quote_id" style="display: none" value="{{ transaktion.quote_id }}">
+                        <label>
+                            <input class="verification_name" name="tr_name" style="width: 270px" type="text"
+                                   value="{{ transaktion.tr_name }}">
+                        </label>
+                        <label>
+                            <input name="tr_quote_id" style="display: none" value="{{ transaktion.quote_id }}">
+                        </label>
                     </td>
-                    <td data="{{ transaktion.tr_amount }}">
+                    <td>
+                        <span>
+                            {% if transaktion.tr_amount|float < 0.0 %}
+                                <div class="verification_amount"
+                                     data-toggle="tooltip"
+                                     data-placement="right"
+                                     title="{{ transaktion.tr_amount }}"
+                                     data="{{ transaktion.tr_amount }}"
+                                     style="color: red; text-align: right">{{ '{:,}'.format(transaktion.tr_amount|float).replace(',', ' ') }}
 
-                        {% if transaktion.tr_amount|float < 0.0 %}
-                            <div data="{{ transaktion.tr_amount }}"
-                                 class="verification_amount"
-                                 data-toggle="tooltip"
-                                 data-placement="right"
-                                 title="{{ transaktion.tr_amount }}"
-                                 style="color: red; text-align: right">{{ '{:,}'.format(transaktion.tr_amount|float).replace(',', ' ') }}
-
-                            </div>
-                        {% else %}
-                            <div data="{{ transaktion.tr_amount }}"
-                                 class="verification_amount V"
-                                 data-toggle="tooltip"
-                                 data-placement="right"
-                                 title="Tooltip on right"
-                                 style="color: aquamarine; text-align: right">{{ '{:,}'.format(transaktion.tr_amount|float).replace(',', ' ') }}
-                            </div>
-
-                        {% endif %}
+                                </div>
+                            {% else %}
+                                <div class="verification_amount V"
+                                     data-toggle="tooltip"
+                                     data-placement="right"
+                                     title="{{ transaktion.tr_amount }}"
+                                     style="color: aquamarine; text-align: right">{{ '{:,}'.format(transaktion.tr_amount|float).replace(',', ' ') }}
+                                </div>
+                            {% endif %}
                         </span>
                     </td>
+                    <td style="text-align: right">ex.moms</td>
+                    <td style="text-align: right">moms</td>
                     <td style="text-align: right">{{ transaktion.konto_p }}</td>
                     <td data="{{ transaktion.konto_s }}" style="text-align: right">
-                        <input name="tr_konto_s"
-                               class="verification_account"
-                               style="text-align: right; width: 50px"
-                               type="text"
-                               value="{{ transaktion.konto_s }}">
+                        <label>
+                            <input name="tr_konto_s"
+                                   class="verification_account"
+                                   style="text-align: right; width: 50px"
+                                   type="text"
+                                   value="{{ transaktion.konto_s }}">
+                        </label>
                     </td>
                     <td>
                         {% if transaktion.konto_s == '1799' or transaktion.konto_s == '1910' %}
                             <div class="verification_status" style="color: red">
                                 <label>
-                                    <i class="fa fa-file"> Verifiera</i>
+                                    <i class="fa fa-file">Verifiera</i>
                                     <input type="file" style="display: none;" name="tr_file">
                                 </label>
                             </div>
@@ -177,7 +186,7 @@
                         {% endif %}
                     </td>
                     <td>
-                        <select name="tr_moms" id="moms">
+                        <label for="moms"></label><select name="tr_moms" id="moms">
 
                             <option value="0"
                                     {% if transaktion.moms == '0' %}
@@ -212,8 +221,5 @@
         </table>
         <button type="submit"><i class="fa fa-refresh"></i></button>
     </form>
-
-
-
-
+                               
 {% endblock %}

@@ -10,7 +10,7 @@
         <div class="col-md-12 mt-3 mb-3">
             <h3> Momskalkylator</h3>
             <div id="label-for-momsrate">Momssats:</div>
-            <select id="momsrate">
+            <label for="momsrate">Momms</label><select id="momsrate">
                 <option value="0.25">25%</option>
                 <option value="0.12">12%</option>
                 <option value="0.06">6%</option>
@@ -21,16 +21,16 @@
                 <div class="form-row">
                     <div class="col-sm-4 mt-1">
                         Pris utan Moms:
-                        <input type="text" class="form-control calcUtan" id="calcUtan" onchange="calcU()">
+                        <label for="calcUtan"></label><input type="text" class="form-control calcUtan" id="calcUtan" onchange="calcU()">
                         <div id="error2"></div>
                     </div>
                     <div class="col-sm-4 mt-1">
                         Summa moms:
-                        <input type="text" class="form-control momsen" placeholder="" id="momsen" onchange="calcM()">
+                        <label for="momsen"></label><input type="text" class="form-control momsen" placeholder="" id="momsen" onchange="calcM()">
                     </div>
                     <div class="col-sm-4 mt-1">
                         Pris med Moms:
-                        <input type="text" class="form-control calcMed" placeholder="" id="calcMed" onchange="calcMe()">
+                        <label for="calcMed"></label><input type="text" class="form-control calcMed" placeholder="" id="calcMed" onchange="calcMe()">
                         <div id="error1"></div>
                     </div>
                 </div>
